@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Navigation System</title>
+  <style>
+    /* -----------------------------------------------------------------------
+       Base
+    ----------------------------------------------------------------------- */
+    :root {
+      --bg: #0A0F2C;
+      --bg-2: #0E1538;
+      --panel: rgba(14, 21, 56, 0.85);
+      --panel-border: rgba(0, 212, 255, 0.18);
+      --cyan: #00D4FF;
+      --cyan-dim: #0090B8;
+      --red: #FF3B5C;
+      --green: #3BFFA0;
+      --yellow: #FFD23B;
+      --text: #E6F0FF;
+      --text-dim: #8FA3C7;
+      --mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow: hidden;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 20% 10%, rgba(0, 212, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(0, 212, 255, 0.05), transparent 45%),
+        var(--bg);
+    }
+
+    /* Subtle moving grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      grid-template-rows: 1fr auto auto;
+      grid-template-areas:
+        "map  sidebar"
+        "results sidebar"
+        "ticker ticker";
+      width: 100vw;
+      height: 100vh;
+      gap: 0;
+      z-index: 1;
+    }
+
+    /* -----------------------------------------------------------------------
+       Header
+    ----------------------------------------------------------------------- */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      background: linear-gradient(180deg, rgba(10, 15, 44, 0.95), rgba(10, 15, 44, 0.6));
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--panel-border);
+      z-index: 10;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .topbar h1 span { color: var(--cyan); }
+    .topbar .modes {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .mode-btn {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--panel-border);
+      padding: 6px 12px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+    }
+    .mode-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+    .mode-btn.active {
+      color: var(--bg);
+      background: var(--cyan);
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    /* -----------------------------------------------------------------------
+       Map area
+    ----------------------------------------------------------------------- */
+    .map-area {
+      grid-area: map;
+      position: relative;
+      margin: 56px 0 0 0;
+      overflow: hidden;
+    }
+    .map-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent 0, transparent 39px, rgba(0,212,255,0.03) 40px),
+        repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(0,212,255,0.03) 40px);
+      pointer-events: none;
+    }
+    #map-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #map-canvas:active { cursor: grabbing; }
+
+    .map-overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .map-overlay .coord {
+      color: var(--cyan);
+    }
+
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      display: flex;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      background: var(--panel);
+      padding: 8px 12px;
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .legend .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .legend .dot.open { background: #6E8BBA; }
+    .legend .dot.path { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    .legend .dot.blocked { background: var(--red); }
+    .legend .dot.visited { background: var(--yellow); }
+
+    /* -----------------------------------------------------------------------
+       Sidebar
+    ----------------------------------------------------------------------- */
+    .sidebar {
+      grid-area: sidebar;
+      margin: 56px 0 0 0;
+      background: var(--panel);
+      border-left: 1px solid var(--panel-border);
+      padding: 20px;
+      overflow-y: auto;
+      backdrop-filter: blur(8px);
+    }
+    .sidebar h2 {
+      margin: 0 0 16px 0;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .field select, .field input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      border-radius: 4px;
+      outline: none;
+      transition: border 0.2s ease;
+    }
+    .field select:focus, .field input[type="text"]:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
+    }
+
+    .row { display: flex; gap: 8px; }
+    .row > * { flex: 1; }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .toggle .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .switch {
+      position: relative;
+      width: 38px;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+    .switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: var(--text-dim);
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+    .toggle.on .switch { background: rgba(0, 212, 255, 0.4); }
+    .toggle.on .switch::after { left: 20px; background: var(--cyan); }
+    .toggle.emergency.on .switch { background: rgba(255, 59, 92, 0.4); }
+    .toggle.emergency.on .switch::after { background: var(--red); }
+
+    button.primary, button.secondary, button.danger {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--cyan);
+      background: var(--cyan);
+      color: var(--bg);
+      font-weight: 600;
+    }
+    button.primary:hover { box-shadow: 0 0 14px var(--cyan); }
+    button.primary:disabled { opacity: 0.5; cursor: wait; }
+    button.secondary {
+      background: transparent;
+      color: var(--cyan);
+    }
+    button.secondary:hover { background: rgba(0, 212, 255, 0.1); }
+    button.danger {
+      background: transparent;
+      color: var(--red);
+      border-color: var(--red);
+    }
+    button.danger:hover { background: rgba(255, 59, 92, 0.1); }
+
+    /* -----------------------------------------------------------------------
+       Results
+    ----------------------------------------------------------------------- */
+    .results {
+      grid-area: results;
+      background: var(--panel);
+      border-top: 1px solid var(--panel-border);
+      padding: 20px;
+      max-height: 240px;
+      overflow-y: auto;
+      backdrop-filter: blur(8px);
+    }
+    .results.hidden { display: none; }
+    .summary {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .summary .stat {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 16px;
+      background: rgba(0, 212, 255, 0.06);
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+    }
+    .summary .stat .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .summary .stat .value {
+      font-family: var(--mono);
+      font-size: 22px;
+      color: var(--cyan);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .summary .stat .unit {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-left: 4px;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-left: 2px solid var(--cyan);
+      border-radius: 0 4px 4px 0;
+      opacity: 0;
+      transform: translateX(-12px);
+      animation: slideIn 0.35s ease forwards;
+    }
+    .step .num {
+      font-family: var(--mono);
+      color: var(--cyan);
+      font-weight: 600;
+      min-width: 28px;
+    }
+    .step .text {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .step .dist {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .alt-route {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 210, 59, 0.05);
+      border: 1px dashed rgba(255, 210, 59, 0.4);
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .alt-route .info { color: var(--yellow); font-family: var(--mono); }
+    .alt-route button {
+      padding: 6px 10px;
+      font-size: 10px;
+      border: 1px solid var(--yellow);
+      background: transparent;
+      color: var(--yellow);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--mono);
+      letter-spacing: 1px;
+    }
+    .alt-route button:hover { background: rgba(255, 210, 59, 0.1); }
+
+    /* -----------------------------------------------------------------------
+       Ticker
+    ----------------------------------------------------------------------- */
+    .ticker {
+      grid-area: ticker;
+      height: 36px;
+      background: linear-gradient(90deg, var(--bg-2), var(--bg));
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 24px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .ticker .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ticker .pill .v {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+    .ticker .pill .v.red { color: var(--red); }
+
+    /* -----------------------------------------------------------------------
+       Block manager
+    ----------------------------------------------------------------------- */
+    .block-manager {
+      margin-top: 20px;
+    }
+    .block-manager h3 {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .block-manager h3 .caret { transition: transform 0.2s; }
+    .block-manager.collapsed h3 .caret { transform: rotate(-90deg); }
+    .block-list {
+      max-height: 240px;
+      overflow-y: auto;
+      transition: max-height 0.3s ease;
+    }
+    .block-manager.collapsed .block-list { max-height: 0; overflow: hidden; }
+    .block-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(0,212,255,0.06);
+      font-size: 12px;
+    }
+    .block-row .path { color: var(--text); }
+    .block-row .badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+    .badge.open { color: var(--green); border: 1px solid var(--green); }
+    .badge.blocked { color: var(--red); border: 1px solid var(--red); }
+    .block-row button {
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .block-row button:hover { color: var(--cyan); border-color: var(--cyan); }
+    .block-row.blocked button { color: var(--red); border-color: var(--red); }
+
+    /* -----------------------------------------------------------------------
+       Visualiser panel
+    ----------------------------------------------------------------------- */
+    .viz-panel {
+      position: absolute;
+      top: 72px;
+      right: 16px;
+      width: 260px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      padding: 12px;
+      backdrop-filter: blur(8px);
+      max-height: 60vh;
+      overflow-y: auto;
+      display: none;
+    }
+    .viz-panel.active { display: block; }
+    .viz-panel h4 {
+      margin: 0 0 8px 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+    .viz-panel .speed {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .viz-panel .speed button {
+      flex: 1;
+      padding: 4px 6px;
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .viz-panel .speed button.active {
+      background: var(--cyan);
+      color: var(--bg);
+      border-color: var(--cyan);
+    }
+    .queue {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text);
+    }
+    .queue .item {
+      padding: 3px 6px;
+      border-bottom: 1px solid rgba(0,212,255,0.08);
+      display: flex;
+      justify-content: space-between;
+    }
+    .queue .item .d { color: var(--cyan); }
+
+    /* -----------------------------------------------------------------------
+       Toast
+    ----------------------------------------------------------------------- */
+    .toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-12px);
+      background: var(--panel);
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.info { border-color: var(--cyan); color: var(--cyan); }
+
+    /* -----------------------------------------------------------------------
+       Tooltip
+    ----------------------------------------------------------------------- */
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--bg-2);
+      border: 1px solid var(--cyan);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--mono);
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.15s;
+      max-width: 220px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .tooltip.show { opacity: 1; }
+    .tooltip .name { color: var(--cyan); font-weight: 600; margin-bottom: 2px; }
+    .tooltip .meta { color: var(--text-dim); font-size: 10px; }
+
+    /* -----------------------------------------------------------------------
+       Scrollbars
+    ----------------------------------------------------------------------- */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.4); }
+
+    /* -----------------------------------------------------------------------
+       Responsive
+    ----------------------------------------------------------------------- */
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 50vh auto auto auto;
+        grid-template-areas:
+          "map"
+          "sidebar"
+          "results"
+          "ticker";
+      }
+      .sidebar { max-height: 360px; }
+      .results { max-height: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>Campus&nbsp;<span>Nav</span>&nbsp;System</h1>
+    <div class="modes">
+      <button class="mode-btn active" data-mode="normal">Navigate</button>
+      <button class="mode-btn" data-mode="visualize">Visualize Dijkstra</button>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="map-area">
+      <canvas id="map-canvas"></canvas>
+      <div class="map-overlay">
+        <div>MODE: <span class="coord" id="mode-label">NAVIGATE</span></div>
+        <div>ZOOM: <span class="coord" id="zoom-label">100%</span></div>
+      </div>
+      <div class="legend">
+        <span><span class="dot open"></span>Open</span>
+        <span><span class="dot path"></span>Path</span>
+        <span><span class="dot blocked"></span>Blocked</span>
+        <span><span class="dot visited"></span>Visited</span>
+      </div>
+      <div class="viz-panel" id="viz-panel">
+        <h4>Priority Queue</h4>
+        <div class="speed">
+          <button data-speed="600">Slow</button>
+          <button data-speed="300" class="active">Normal</button>
+          <button data-speed="100">Fast</button>
+        </div>
+        <div class="queue" id="queue-list"></div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h2>Route Planner</h2>
+
+      <div class="field">
+        <label for="src-input">Source</label>
+        <input type="text" id="src-input" placeholder="Search source..." autocomplete="off" />
+        <select id="src-select" size="4"></select>
+      </div>
+
+      <div class="field">
+        <label for="dst-input">Destination</label>
+        <input type="text" id="dst-input" placeholder="Search destination..." autocomplete="off" />
+        <select id="dst-select" size="4"></select>
+      </div>
+
+      <div class="toggle" id="avoid-toggle">
+        <span class="label">Avoid Blocked Roads</span>
+        <span class="switch"></span>
+      </div>
+
+      <div class="toggle emergency" id="emergency-toggle">
+        <span class="label">Emergency Route</span>
+        <span class="switch"></span>
+      </div>
+
+      <div class="row" style="margin-top: 14px;">
+        <button class="primary" id="find-btn">Find Shortest Path</button>
+      </div>
+      <div class="row" style="margin-top: 8px;">
+        <button class="secondary" id="clear-btn">Clear / Reset</button>
+      </div>
+
+      <div class="block-manager" id="block-manager">
+        <h3><span>Road Block Manager</span><span class="caret">▼</span></h3>
+        <div class="block-list" id="block-list"></div>
+      </div>
+    </aside>
+
+    <section class="results hidden" id="results">
+      <div class="summary">
+        <div class="stat">
+          <div class="label">Total Distance</div>
+          <div class="value"><span id="dist-value">0</span><span class="unit">m</span></div>
+        </div>
+        <div class="stat">
+          <div class="label">Walking Time</div>
+          <div class="value"><span id="time-value">0</span><span class="unit">min</span></div>
+        </div>
+        <div class="stat">
+          <div class="label">Stops</div>
+          <div class="value"><span id="stops-value">0</span></div>
+        </div>
+      </div>
+      <div class="steps" id="steps"></div>
+      <div class="alt-route hidden" id="alt-route">
+        <span class="info">Alternative route available: <span id="alt-dist"></span> m</span>
+        <button id="alt-btn">Use Alt</button>
+      </div>
+    </section>
+
+    <footer class="ticker">
+      <span class="pill">Locations: <span class="v" id="t-loc">0</span></span>
+      <span class="pill">Paths: <span class="v" id="t-edges">0</span></span>
+      <span class="pill">Blocked: <span class="v red" id="t-blocked">0</span></span>
+      <span class="pill" style="margin-left:auto">Algorithm: <span class="v">Dijkstra / min-heap / O((V+E)logV)</span></span>
+    </footer>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* ========================================================================
+     Campus Navigation System - Frontend
+     ====================================================================== */
+  (function () {
+    'use strict';
+
+    // ---------- State ----------
+    const state = {
+      locations: [],   // [{id, name, type, lat, lng, x, y, description}]
+      edges: [],       // [{id, source, destination, distance, is_blocked, path_name}]
+      pathIds: [],     // ordered list of location ids on the active path
+      altPathIds: [],
+      srcId: null,
+      dstId: null,
+      avoidBlocked: true,
+      emergency: false,
+      mode: 'normal',  // 'normal' | 'visualize'
+      vizTrace: null,
+      vizIndex: 0,
+      vizTimer: null,
+      vizSpeed: 300,
+      vizVisited: new Set(),
+      vizUpdated: null,
+      edgeById: new Map(),
+      locById: new Map(),
+      hoverNode: null,
+      clickMode: 'none', // 'src' | 'dst' | 'none'
+    };
+
+    // ---------- DOM ----------
+    const $ = (id) => document.getElementById(id);
+    const canvas = $('map-canvas');
+    const ctx = canvas.getContext('2d');
+    const tooltip = $('tooltip');
+    const toast = $('toast');
+    const queueList = $('queue-list');
+
+    // ---------- Toast ----------
+    let toastTimer = null;
+    function showToast(message, type = 'error') {
+      toast.textContent = message;
+      toast.className = 'toast show ' + (type === 'info' ? 'info' : '');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ---------- API ----------
+    async function api(url, options = {}) {
+      try {
+        const res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        return data;
+      } catch (err) {
+        showToast(err.message || 'Network error');
+        throw err;
+      }
+    }
+
+    // ---------- Canvas geometry ----------
+    const NODE_RADIUS = 8;
+    const HOVER_RADIUS = 12;
+    const PADDING = 40;
+    let view = { zoom: 1, offsetX: 0, offsetY: 0 };
+    let nodePositions = new Map(); // id -> {x, y, screenX, screenY}
+    let animationFrameId = null;
+    let animOffset = 0;
+
+    function hasActiveAnimation() {
+      return state.pathIds.length > 1 || state.altPathIds.length > 1;
+    }
+
+    function startAnimationLoop() {
+      if (animationFrameId !== null || !hasActiveAnimation()) return;
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    function stopAnimationLoop() {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    }
+
+    function animate() {
+      animationFrameId = null;
+      draw();
+      if (hasActiveAnimation()) startAnimationLoop();
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      computeLayout();
+      draw();
+    }
+
+    function computeLayout() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const drawW = (w - PADDING * 2) * view.zoom;
+      const drawH = (h - PADDING * 2) * view.zoom;
+      nodePositions.clear();
+      state.locations.forEach((loc) => {
+        // Normalised coords are 0..1. We invert Y so up is "north".
+        const sx = PADDING + loc.x * drawW + view.offsetX;
+        const sy = PADDING + (1 - loc.y) * drawH + view.offsetY;
+        nodePositions.set(loc.id, { x: sx, y: sy, loc });
+      });
+    }
+
+    // ---------- Drawing ----------
+    function draw() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      if (hasActiveAnimation()) {
+        animOffset = (animOffset + 0.6) % 20;
+      }
+
+      // Background soft pulse
+      drawBackdrop();
+
+      // Edges first
+      drawEdges();
+      // Path
+      drawActivePath();
+      // Nodes
+      drawNodes();
+    }
+
+    function drawBackdrop() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      // A subtle radial glow at center
+      const grad = ctx.createRadialGradient(
+        rect.width / 2, rect.height / 2, 0,
+        rect.width / 2, rect.height / 2, Math.max(rect.width, rect.height) / 1.5
+      );
+      grad.addColorStop(0, 'rgba(0, 212, 255, 0.04)');
+      grad.addColorStop(1, 'rgba(0, 212, 255, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+    }
+
+    function edgeKey(a, b) { return a < b ? `${a}-${b}` : `${b}-${a}`; }
+    const pathEdgeSet = new Set();
+    function rebuildPathEdgeSet() {
+      pathEdgeSet.clear();
+      for (let i = 0; i < state.pathIds.length - 1; i++) {
+        pathEdgeSet.add(edgeKey(state.pathIds[i], state.pathIds[i + 1]));
+      }
+    }
+
+    function drawEdges() {
+      const drawn = new Set();
+      state.edges.forEach((edge) => {
+        const k = edgeKey(edge.source, edge.destination);
+        if (drawn.has(k)) return;
+        drawn.add(k);
+
+        const a = nodePositions.get(edge.source);
+        const b = nodePositions.get(edge.destination);
+        if (!a || !b) return;
+
+        const isPath = pathEdgeSet.has(k) || state.altPathIds.length > 0 && altEdgeInPath(edge);
+        const isBlocked = edge.is_blocked;
+
+        ctx.lineWidth = isPath ? 3 : 1.4;
+        ctx.strokeStyle = isBlocked
+          ? 'rgba(255, 59, 92, 0.85)'
+          : isPath
+            ? '#00D4FF'
+            : 'rgba(110, 139, 186, 0.45)';
+
+        if (isPath) {
+          ctx.shadowColor = 'rgba(0, 212, 255, 0.9)';
+          ctx.shadowBlur = 12;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+
+        // Animated dash offset for the path
+        if (isPath) {
+          drawAnimatedDash(a, b);
+        }
+      });
+    }
+
+    function altEdgeInPath(edge) {
+      for (let i = 0; i < state.altPathIds.length - 1; i++) {
+        if (edgeKey(state.altPathIds[i], state.altPathIds[i + 1]) === edgeKey(edge.source, edge.destination)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function drawAnimatedDash(a, b) {
+      ctx.save();
+      ctx.setLineDash([6, 10]);
+      ctx.lineDashOffset = -animOffset;
+      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawActivePath() {
+      if (state.pathIds.length < 2) return;
+      // Moving dot along the path
+      const t = (performance.now() / 1000) % 1;
+      drawMovingDot(t);
+    }
+
+    function drawMovingDot(t) {
+      // Sample t along the polyline of the path.
+      const pts = state.pathIds.map(id => nodePositions.get(id)).filter(Boolean);
+      if (pts.length < 2) return;
+
+      const lengths = [];
+      let total = 0;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const dx = pts[i + 1].x - pts[i].x;
+        const dy = pts[i + 1].y - pts[i].y;
+        const len = Math.hypot(dx, dy);
+        lengths.push(len);
+        total += len;
+      }
+      const target = t * total;
+      let acc = 0;
+      for (let i = 0; i < lengths.length; i++) {
+        if (acc + lengths[i] >= target) {
+          const local = (target - acc) / lengths[i];
+          const x = pts[i].x + (pts[i + 1].x - pts[i].x) * local;
+          const y = pts[i].y + (pts[i + 1].y - pts[i].y) * local;
+          ctx.save();
+          ctx.shadowColor = 'rgba(0, 212, 255, 1)';
+          ctx.shadowBlur = 14;
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          break;
+        }
+        acc += lengths[i];
+      }
+    }
+
+    function drawNodes() {
+      state.locations.forEach((loc) => {
+        const p = nodePositions.get(loc.id);
+        if (!p) return;
+        const isOnPath = state.pathIds.includes(loc.id);
+        const isAlt = state.altPathIds.includes(loc.id);
+        const isVisited = state.vizVisited.has(loc.id);
+        const isHover = state.hoverNode === loc.id;
+        const isSrc = state.srcId === loc.id;
+        const isDst = state.dstId === loc.id;
+
+        const r = isHover ? HOVER_RADIUS : NODE_RADIUS;
+
+        // Outer glow
+        ctx.save();
+        if (isOnPath) {
+          ctx.shadowColor = 'rgba(0, 212, 255, 0.9)';
+          ctx.shadowBlur = 18;
+          ctx.fillStyle = '#00D4FF';
+        } else if (isAlt) {
+          ctx.shadowColor = 'rgba(255, 210, 59, 0.7)';
+          ctx.shadowBlur = 12;
+          ctx.fillStyle = '#FFD23B';
+        } else if (isVisited) {
+          ctx.shadowColor = 'rgba(255, 210, 59, 0.6)';
+          ctx.shadowBlur = 8;
+          ctx.fillStyle = '#FFD23B';
+        } else {
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = '#6E8BBA';
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Inner dot
+        ctx.fillStyle = isSrc ? '#FFD23B' : isDst ? '#FF3B5C' : '#0A0F2C';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Label
+        ctx.fillStyle = isOnPath || isHover ? '#E6F0FF' : 'rgba(230, 240, 255, 0.85)';
+        ctx.font = '11px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(loc.name, p.x, p.y + r + 4);
+      });
+    }
+
+    // ---------- Populate dropdowns ----------
+    function renderLocationOptions(select, filter = '') {
+      const f = filter.toLowerCase();
+      select.innerHTML = '';
+      state.locations
+        .filter(l => !f || l.name.toLowerCase().includes(f))
+        .forEach((loc) => {
+          const opt = document.createElement('option');
+          opt.value = loc.id;
+          opt.textContent = loc.name;
+          select.appendChild(opt);
+        });
+    }
+
+    function updateTickerStats() {
+      $('t-loc').textContent = state.locations.length;
+      $('t-edges').textContent = state.edges.length;
+      $('t-blocked').textContent = state.edges.filter(e => e.is_blocked).length;
+    }
+
+    // ---------- Block manager ----------
+    function renderBlockList() {
+      const list = $('block-list');
+      list.innerHTML = '';
+      // Show unique undirected paths to avoid duplicates
+      const seen = new Set();
+      const unique = [];
+      state.edges.forEach((e) => {
+        const k = edgeKey(e.source, e.destination);
+        if (seen.has(k)) return;
+        seen.add(k);
+        unique.push(e);
+      });
+      unique.forEach((edge) => {
+        const a = state.locById.get(edge.source);
+        const b = state.locById.get(edge.destination);
+        if (!a || !b) return;
+        const row = document.createElement('div');
+        row.className = 'block-row' + (edge.is_blocked ? ' blocked' : '');
+        row.innerHTML = `
+          <div>
+            <span class="badge ${edge.is_blocked ? 'blocked' : 'open'}">${edge.is_blocked ? 'BLOCKED' : 'OPEN'}</span>
+            <span class="path">${a.name} to ${b.name}</span>
+          </div>
+          <button data-edge="${edge.id}">${edge.is_blocked ? 'Unblock' : 'Block'}</button>
+        `;
+        list.appendChild(row);
+      });
+      list.querySelectorAll('button[data-edge]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const edgeId = parseInt(btn.dataset.edge, 10);
+          // Find a directed edge of this pair to toggle.
+          const edge = state.edges.find(e => e.id === edgeId);
+          if (!edge) return;
+          const newState = !edge.is_blocked;
+          try {
+            const result = await api('/api/toggle-block/', {
+              method: 'POST',
+              body: JSON.stringify({ edge_id: edge.id, is_blocked: newState }),
+            });
+            // Update both directed edges in state
+            const k = edgeKey(edge.source, edge.destination);
+            state.edges.forEach((e) => {
+              if (edgeKey(e.source, e.destination) === k) {
+                e.is_blocked = result.edge.is_blocked;
+              }
+            });
+            renderBlockList();
+            updateTickerStats();
+            draw();
+          } catch (err) {
+            // toast already shown
+          }
+        });
+      });
+    }
+
+    // ---------- Find path ----------
+    async function findPath() {
+      if (!state.srcId || !state.dstId) {
+        showToast('Please select both source and destination', 'info');
+        return;
+      }
+      if (state.srcId === state.dstId) {
+        showToast('Source and destination cannot be the same', 'info');
+        return;
+      }
+      const blockedIds = state.avoidBlocked
+        ? state.edges.filter(e => e.is_blocked).map(e => e.id)
+        : [];
+
+      const btn = $('find-btn');
+      btn.disabled = true;
+      btn.textContent = 'Calculating...';
+      try {
+        const data = await api('/api/find-path/', {
+          method: 'POST',
+          body: JSON.stringify({
+            source_id: state.srcId,
+            destination_id: state.dstId,
+            blocked_ids: blockedIds,
+            avoid_blocked: state.avoidBlocked,
+            emergency: state.emergency,
+          }),
+        });
+        state.pathIds = data.path.map(p => p.id);
+        rebuildPathEdgeSet();
+        renderResults(data);
+        draw();
+        startAnimationLoop();
+      } catch (err) {
+        // toast handled in api()
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Find Shortest Path';
+      }
+    }
+
+    function renderResults(data) {
+      $('results').classList.remove('hidden');
+      $('dist-value').textContent = Math.round(data.distance);
+      $('time-value').textContent = (data.time_minutes || (data.time / 60)).toFixed(1);
+      $('stops-value').textContent = data.path.length;
+
+      const steps = $('steps');
+      steps.innerHTML = '';
+      data.steps.forEach((step, idx) => {
+        const div = document.createElement('div');
+        div.className = 'step';
+        div.style.animationDelay = (idx * 100) + 'ms';
+        div.innerHTML = `
+          <span class="num">${String(step.step).padStart(2, '0')}</span>
+          <span class="text">${step.instruction}</span>
+          <span class="dist">${step.distance > 0 ? Math.round(step.distance) + 'm' : ''}</span>
+        `;
+        steps.appendChild(div);
+      });
+
+      // Alternative route
+      if (data.alternative && data.alternative.path) {
+        state.altPathIds = data.alternative.path.map(p => p.id);
+        $('alt-route').classList.remove('hidden');
+        $('alt-dist').textContent = Math.round(data.alternative.distance);
+        $('alt-btn').onclick = () => {
+          state.pathIds = state.altPathIds.slice();
+          state.altPathIds = [];
+          rebuildPathEdgeSet();
+          // Re-render with this path's data (simplified: reuse same data)
+          draw();
+          startAnimationLoop();
+          $('alt-route').classList.add('hidden');
+        };
+      } else {
+        state.altPathIds = [];
+        $('alt-route').classList.add('hidden');
+      }
+    }
+
+    // ---------- Visualise mode ----------
+    async function startVisualize() {
+      if (!state.srcId || !state.dstId) {
+        showToast('Select source and destination first', 'info');
+        return;
+      }
+      const blockedIds = state.avoidBlocked
+        ? state.edges.filter(e => e.is_blocked).map(e => e.id)
+        : [];
+      try {
+        const data = await api('/api/visualize/', {
+          method: 'POST',
+          body: JSON.stringify({
+            source_id: state.srcId,
+            destination_id: state.dstId,
+            blocked_ids: blockedIds,
+            avoid_blocked: state.avoidBlocked,
+          }),
+        });
+        state.vizTrace = data.trace;
+        state.vizIndex = 0;
+        state.vizVisited = new Set();
+        state.vizUpdated = null;
+        $('viz-panel').classList.add('active');
+        runVizStep();
+      } catch (err) { /* toast */ }
+    }
+
+    function runVizStep() {
+      if (!state.vizTrace || state.vizIndex >= state.vizTrace.length) {
+        showToast('Visualisation complete', 'info');
+        return;
+      }
+      const step = state.vizTrace[state.vizIndex];
+      state.vizVisited.add(step.visited_id);
+      if (step.updated_id) state.vizUpdated = step.updated_id;
+      // Render queue
+      queueList.innerHTML = '';
+      step.queue.forEach((q) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        const loc = state.locById.get(q.node_id);
+        div.innerHTML = `<span>${loc ? loc.name : 'Node ' + q.node_id}</span><span class="d">${q.distance.toFixed(0)}m</span>`;
+        queueList.appendChild(div);
+      });
+      draw();
+      state.vizIndex++;
+      state.vizTimer = setTimeout(runVizStep, state.vizSpeed);
+    }
+
+    // ---------- Mouse interactions ----------
+    function findNodeAt(x, y) {
+      for (const [id, p] of nodePositions) {
+        if (Math.hypot(p.x - x, p.y - y) < HOVER_RADIUS + 4) {
+          return id;
+        }
+      }
+      return null;
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const id = findNodeAt(x, y);
+      state.hoverNode = id;
+      if (id != null) {
+        const loc = state.locById.get(id);
+        tooltip.style.left = (e.clientX + 12) + 'px';
+        tooltip.style.top = (e.clientY + 12) + 'px';
+        tooltip.innerHTML = `
+          <div class="name">${loc.name}</div>
+          <div class="meta">${loc.type.toUpperCase()} - ${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}</div>
+          <div class="meta" style="margin-top:4px">${loc.description || ''}</div>
+        `;
+        tooltip.classList.add('show');
+        canvas.style.cursor = 'pointer';
+      } else {
+        tooltip.classList.remove('show');
+        canvas.style.cursor = 'grab';
+      }
+      draw();
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      state.hoverNode = null;
+      tooltip.classList.remove('show');
+      draw();
+    });
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const id = findNodeAt(x, y);
+      if (id == null) return;
+      // Default: clicking a node sets it as source if none, else destination.
+      if (!state.srcId || (state.srcId && state.dstId)) {
+        state.srcId = id;
+        state.dstId = null;
+        syncSelectionInputs();
+        showToast('Source set: ' + state.locById.get(id).name, 'info');
+      } else {
+        state.dstId = id;
+        syncSelectionInputs();
+        showToast('Destination set: ' + state.locById.get(id).name, 'info');
+      }
+      draw();
+    });
+
+    // Pan with drag
+    let dragging = false;
+    let lastX = 0, lastY = 0;
+    canvas.addEventListener('mousedown', (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+    window.addEventListener('mouseup', () => { dragging = false; });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      view.offsetX += dx;
+      view.offsetY += dy;
+      computeLayout();
+      draw();
+    });
+
+    // Zoom with wheel
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      view.zoom = Math.min(3, Math.max(0.5, view.zoom * factor));
+      computeLayout();
+      draw();
+      $('zoom-label').textContent = Math.round(view.zoom * 100) + '%';
+    }, { passive: false });
+
+    // ---------- Inputs ----------
+    function syncSelectionInputs() {
+      const setSel = (sel, id) => {
+        if (id == null) return;
+        sel.value = String(id);
+      };
+      setSel($('src-select'), state.srcId);
+      setSel($('dst-select'), state.dstId);
+    }
+
+    $('src-input').addEventListener('input', (e) => {
+      renderLocationOptions($('src-select'), e.target.value);
+    });
+    $('dst-input').addEventListener('input', (e) => {
+      renderLocationOptions($('dst-select'), e.target.value);
+    });
+    $('src-select').addEventListener('change', (e) => {
+      state.srcId = parseInt(e.target.value, 10);
+      draw();
+    });
+    $('dst-select').addEventListener('change', (e) => {
+      state.dstId = parseInt(e.target.value, 10);
+      draw();
+    });
+
+    $('find-btn').addEventListener('click', findPath);
+
+    $('clear-btn').addEventListener('click', () => {
+      state.pathIds = [];
+      state.altPathIds = [];
+      state.srcId = null;
+      state.dstId = null;
+      state.vizVisited.clear();
+      stopAnimationLoop();
+      rebuildPathEdgeSet();
+      $('results').classList.add('hidden');
+      $('viz-panel').classList.remove('active');
+      $('mode-label').textContent = 'NAVIGATE';
+      $('src-input').value = '';
+      $('dst-input').value = '';
+      renderLocationOptions($('src-select'));
+      renderLocationOptions($('dst-select'));
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'normal'));
+      state.mode = 'normal';
+      if (state.vizTimer) clearTimeout(state.vizTimer);
+      draw();
+    });
+
+    $('avoid-toggle').addEventListener('click', () => {
+      state.avoidBlocked = !state.avoidBlocked;
+      $('avoid-toggle').classList.toggle('on', state.avoidBlocked);
+    });
+    $('emergency-toggle').addEventListener('click', () => {
+      state.emergency = !state.emergency;
+      $('emergency-toggle').classList.toggle('on', state.emergency);
+    });
+
+    $('block-manager').querySelector('h3').addEventListener('click', () => {
+      $('block-manager').classList.toggle('collapsed');
+    });
+
+    document.querySelectorAll('.mode-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.mode = btn.dataset.mode;
+        if (state.vizTimer) { clearTimeout(state.vizTimer); state.vizTimer = null; }
+        $('mode-label').textContent = state.mode === 'visualize' ? 'VISUALIZE' : 'NAVIGATE';
+        if (state.mode === 'visualize') {
+          startVisualize();
+        } else {
+          $('viz-panel').classList.remove('active');
+          state.vizVisited.clear();
+          draw();
+        }
+      });
+    });
+
+    document.querySelectorAll('.viz-panel .speed button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.viz-panel .speed button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.vizSpeed = parseInt(btn.dataset.speed, 10);
+      });
+    });
+
+    // ---------- Initial load ----------
+    async function init() {
+      try {
+        const data = await api('/api/campus-graph/');
+        state.locations = data.locations;
+        state.edges = data.edges;
+        state.locById = new Map(state.locations.map(l => [l.id, l]));
+        state.edgeById = new Map(state.edges.map(e => [e.id, e]));
+        renderLocationOptions($('src-select'));
+        renderLocationOptions($('dst-select'));
+        renderBlockList();
+        updateTickerStats();
+        resizeCanvas();
+        // Stagger node fade-in
+        state.locations.forEach((loc, idx) => {
+          loc._fadeInDelay = idx * 30;
+        });
+        // Trigger first draw with stagger
+        state._appeared = 0;
+        draw();
+      } catch (err) {
+        // already toasted
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    init();
+  })();
+  </script>
+</body>
+</html>
