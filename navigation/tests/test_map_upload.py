@@ -359,3 +359,4 @@ class TestMultiMapAPI(TestCase):
         self.assertEqual(data["map"]["name"], "Detail Test Map")
         self.assertIn("locations", data)
         self.assertIn("edges", data)
+

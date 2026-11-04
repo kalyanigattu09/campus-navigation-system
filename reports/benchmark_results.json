@@ -1,6 +1,6 @@
 {
   "benchmark_suite": "Campus Navigation Dijkstra & Min-Heap Benchmarking Suite",
-  "generated_at": "2026-11-04 06:15:49 UTC",
+  "generated_at": "2026-11-04 10:17:01 UTC",
   "environment": {
     "os": "Windows",
     "os_release": "11",
@@ -19,29 +19,29 @@
   },
   "campus_graph_benchmark": {
     "graph_type": "Production Campus Database",
-    "vertices": 18,
-    "edges": 28,
-    "directed_edges": 56,
-    "density": 0.183,
+    "vertices": 19,
+    "edges": 29,
+    "directed_edges": 58,
+    "density": 0.1696,
     "tested_pairs": 15,
     "total_queries": 30,
     "success_rate_percent": 100.0,
     "latency_custom_heap": {
-      "min_ms": 0.866,
-      "mean_ms": 1.152,
-      "median_ms": 1.051,
-      "p95_ms": 1.496,
-      "p99_ms": 1.746
+      "min_ms": 0.605,
+      "mean_ms": 0.687,
+      "median_ms": 0.653,
+      "p95_ms": 0.879,
+      "p99_ms": 1.202
     },
     "latency_reference_heapq": {
-      "min_ms": 0.847,
-      "mean_ms": 1.12,
-      "median_ms": 1.062,
-      "p95_ms": 1.472
+      "min_ms": 0.605,
+      "mean_ms": 0.652,
+      "median_ms": 0.649,
+      "p95_ms": 0.718
     },
-    "avg_nodes_visited": 8.5,
-    "avg_relaxations": 11.2,
-    "dynamic_rerouting_mean_ms": 4.236
+    "avg_nodes_visited": 8.2,
+    "avg_relaxations": 11.3,
+    "dynamic_rerouting_mean_ms": 2.523
   },
   "scalability_benchmarks": [
     {
@@ -51,18 +51,18 @@
       "trials": 10,
       "correctness_rate_percent": 100.0,
       "custom_heap": {
-        "mean_ms": 0.378,
-        "median_ms": 0.376,
-        "p95_ms": 0.941,
-        "min_ms": 0.009,
-        "max_ms": 1.08
+        "mean_ms": 0.183,
+        "median_ms": 0.178,
+        "p95_ms": 0.462,
+        "min_ms": 0.004,
+        "max_ms": 0.542
       },
       "reference_heapq": {
-        "mean_ms": 0.199,
-        "median_ms": 0.178,
-        "p95_ms": 0.517,
-        "min_ms": 0.006,
-        "max_ms": 0.582
+        "mean_ms": 0.105,
+        "median_ms": 0.087,
+        "p95_ms": 0.29,
+        "min_ms": 0.003,
+        "max_ms": 0.354
       },
       "avg_nodes_visited": 37.9,
       "avg_relaxations": 71.1,
@@ -75,18 +75,18 @@
       "trials": 10,
       "correctness_rate_percent": 100.0,
       "custom_heap": {
-        "mean_ms": 3.505,
-        "median_ms": 3.413,
-        "p95_ms": 8.001,
-        "min_ms": 0.413,
-        "max_ms": 8.136
+        "mean_ms": 1.52,
+        "median_ms": 1.578,
+        "p95_ms": 3.428,
+        "min_ms": 0.186,
+        "max_ms": 3.839
       },
       "reference_heapq": {
-        "mean_ms": 1.94,
-        "median_ms": 1.964,
-        "p95_ms": 4.254,
-        "min_ms": 0.221,
-        "max_ms": 4.775
+        "mean_ms": 0.832,
+        "median_ms": 0.867,
+        "p95_ms": 1.818,
+        "min_ms": 0.1,
+        "max_ms": 2.053
       },
       "avg_nodes_visited": 182.5,
       "avg_relaxations": 356.1,
@@ -99,18 +99,18 @@
       "trials": 10,
       "correctness_rate_percent": 100.0,
       "custom_heap": {
-        "mean_ms": 16.266,
-        "median_ms": 13.77,
-        "p95_ms": 39.063,
-        "min_ms": 1.493,
-        "max_ms": 53.659
+        "mean_ms": 6.279,
+        "median_ms": 7.267,
+        "p95_ms": 8.29,
+        "min_ms": 0.951,
+        "max_ms": 8.357
       },
       "reference_heapq": {
-        "mean_ms": 7.227,
-        "median_ms": 6.043,
-        "p95_ms": 15.619,
-        "min_ms": 0.806,
-        "max_ms": 17.212
+        "mean_ms": 3.246,
+        "median_ms": 3.704,
+        "p95_ms": 4.355,
+        "min_ms": 0.488,
+        "max_ms": 4.605
       },
       "avg_nodes_visited": 691.5,
       "avg_relaxations": 1071.5,
@@ -123,18 +123,18 @@
       "trials": 10,
       "correctness_rate_percent": 100.0,
       "custom_heap": {
-        "mean_ms": 62.329,
-        "median_ms": 68.146,
-        "p95_ms": 97.196,
-        "min_ms": 9.415,
-        "max_ms": 100.506
+        "mean_ms": 31.281,
+        "median_ms": 37.073,
+        "p95_ms": 47.282,
+        "min_ms": 5.414,
+        "max_ms": 47.634
       },
       "reference_heapq": {
-        "mean_ms": 36.021,
-        "median_ms": 38.286,
-        "p95_ms": 62.356,
-        "min_ms": 7.033,
-        "max_ms": 68.375
+        "mean_ms": 17.396,
+        "median_ms": 20.293,
+        "p95_ms": 26.74,
+        "min_ms": 2.96,
+        "max_ms": 27.163
       },
       "avg_nodes_visited": 2920.4,
       "avg_relaxations": 4824.7,
@@ -147,18 +147,18 @@
       "trials": 10,
       "correctness_rate_percent": 100.0,
       "custom_heap": {
-        "mean_ms": 173.927,
-        "median_ms": 192.653,
-        "p95_ms": 220.21,
-        "min_ms": 8.543,
-        "max_ms": 222.483
+        "mean_ms": 78.079,
+        "median_ms": 87.867,
+        "p95_ms": 99.417,
+        "min_ms": 4.223,
+        "max_ms": 100.235
       },
       "reference_heapq": {
-        "mean_ms": 93.371,
-        "median_ms": 108.173,
-        "p95_ms": 115.168,
-        "min_ms": 3.91,
-        "max_ms": 116.205
+        "mean_ms": 46.258,
+        "median_ms": 51.989,
+        "p95_ms": 59.922,
+        "min_ms": 2.783,
+        "max_ms": 61.91
       },
       "avg_nodes_visited": 6582.7,
       "avg_relaxations": 10401.2,
