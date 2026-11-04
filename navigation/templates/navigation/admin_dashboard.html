@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Campus Navigation</title>
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --border-dark: #CBD5E1;
+      --primary: #2563EB;
+      --primary-hover: #1D4ED8;
+      --primary-light: #EFF6FF;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --success: #10B981;
+      --success-bg: #ECFDF5;
+      --danger: #EF4444;
+      --danger-bg: #FEF2F2;
+      --warning: #F59E0B;
+      --warning-bg: #FFFBEB;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .brand-logo svg { width: 18px; height: 18px; }
+    .brand-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover {
+      background: #F1F5F9;
+      color: var(--text);
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .nav-btn.primary:hover {
+      background: var(--primary-hover);
+    }
+    main {
+      flex: 1;
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .stat-val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-val.primary { color: var(--primary); }
+    .stat-val.warning { color: var(--warning); }
+    .stat-val.success { color: var(--success); }
+
+    .tabs-bar {
+      display: flex;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+    }
+    .tab-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      background: #F1F5F9;
+      border-radius: 10px;
+      color: var(--text-muted);
+    }
+    .tab-btn.active .tab-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .search-input {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      min-width: 260px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    th {
+      background: #F8FAFC;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #F8FAFC; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge.building { background: #DBEAFE; color: #1D4ED8; }
+    .badge.gate { background: #FEF3C7; color: #B45309; }
+    .badge.facility { background: #E0E7FF; color: #4338CA; }
+    .badge.landmark { background: #DCFCE7; color: #15803D; }
+    .badge.open { background: var(--success-bg); color: var(--success); }
+    .badge.blocked { background: var(--danger-bg); color: var(--danger); }
+
+    .action-btn {
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      transition: all 0.15s ease;
+      margin-right: 4px;
+    }
+    .action-btn:hover { background: #F1F5F9; }
+    .action-btn.danger { color: var(--danger); border-color: #FECACA; }
+    .action-btn.danger:hover { background: var(--danger-bg); }
+    .action-btn.toggle { color: var(--primary); border-color: #BFDBFE; }
+    .action-btn.toggle:hover { background: var(--primary-light); }
+
+    /* Modal dialog */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 520px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-header h2 { font-size: 18px; font-weight: 600; }
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 18px;
+      background: #0F172A;
+      color: #fff;
+      font-size: 13px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+      z-index: 300;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ---- Map Upload Modal ---- */
+    .upload-dropzone {
+      border: 2px dashed var(--border-dark);
+      border-radius: 10px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #F8FAFC;
+    }
+    .upload-dropzone:hover, .upload-dropzone.drag-over {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .upload-dropzone svg { color: var(--text-muted); margin-bottom: 10px; }
+    .upload-dropzone p { font-size: 14px; color: var(--text-muted); }
+    .upload-dropzone strong { color: var(--primary); }
+    .upload-dropzone .file-name { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 8px; }
+    #upload-file-input { display: none; }
+    .template-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .template-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px; font-size: 12px; font-weight: 500;
+      border: 1px solid var(--border); border-radius: 6px;
+      text-decoration: none; color: var(--text-muted); background: #fff;
+      transition: all 0.15s ease;
+    }
+    .template-btn:hover { background: #F1F5F9; color: var(--text); }
+
+    /* Preview table */
+    .preview-container { max-height: 220px; overflow-y: auto; margin-top: 14px; border: 1px solid var(--border); border-radius: 8px; }
+    .preview-container table { font-size: 12px; }
+    .preview-container th, .preview-container td { padding: 7px 10px; }
+
+    /* Validation feedback */
+    .validation-errors { background: var(--danger-bg); border: 1px solid #FECACA; border-radius: 8px; padding: 12px 16px; margin-top: 12px; }
+    .validation-errors li { font-size: 13px; color: var(--danger); margin-left: 16px; margin-bottom: 4px; }
+    .validation-warnings { background: var(--warning-bg); border: 1px solid #FCD34D; border-radius: 8px; padding: 12px 16px; margin-top: 8px; }
+    .validation-warnings li { font-size: 13px; color: #92400E; margin-left: 16px; margin-bottom: 2px; }
+
+    /* Map cards grid */
+    .maps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+    .map-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px 20px; position: relative;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s ease;
+    }
+    .map-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .map-card.active-map { border-color: var(--primary); background: var(--primary-light); }
+    .map-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .map-card-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .map-card-stats { display: flex; gap: 14px; font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+    .map-card-actions { display: flex; gap: 8px; }
+    .active-badge {
+      position: absolute; top: 12px; right: 14px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 2px 8px; border-radius: 10px; background: var(--primary); color: #fff;
+    }
+    .upload-modal-card { max-width: 680px; }
+    .upload-steps { display: flex; gap: 0; margin-bottom: 20px; }
+    .step-indicator {
+      flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 600;
+      color: var(--text-muted); border-bottom: 2px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .step-indicator.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .step-indicator.done { color: var(--success); border-bottom-color: var(--success); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+          <line x1="9" y1="3" x2="9" y2="18"></line>
+          <line x1="15" y1="6" x2="15" y2="21"></line>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">Admin Management Portal</div>
+        <div class="brand-subtitle">Campus Navigation Graph Administration</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <span style="font-size: 13px; color: var(--text-muted);">Signed in as <strong>{{ username }}</strong></span>
+      <a href="{% url 'home' %}" class="nav-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        </svg>
+        Campus Map
+      </a>
+      <a href="{% url 'analytics' %}" class="nav-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        Analytics
+      </a>
+      <a href="{% url 'admin_logout' %}" class="nav-btn" style="color: var(--danger);">Sign Out</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Registered Locations (V)</div>
+        <div class="stat-val primary" id="stat-loc">{{ stats.total_locations }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Campus Pathways (E)</div>
+        <div class="stat-val" id="stat-edge">{{ stats.total_edges }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Blocked Pathways</div>
+        <div class="stat-val warning" id="stat-blocked">{{ stats.blocked_edges }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Route Inquiries Logged</div>
+        <div class="stat-val success">{{ stats.total_routes_logged }}</div>
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('locations')">
+        Campus Locations
+        <span class="tab-badge">{{ locations|length }}</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('pathways')">
+        Walkway Pathways
+        <span class="tab-badge">{{ stats.total_edges }}</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('activity')">
+        Recent Route Activity
+        <span class="tab-badge">{{ recent_routes|length }}</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('maps')">
+        🗺 Map Management
+        <span class="tab-badge" id="maps-count-badge">—</span>
+      </button>
+    </div>
+
+    <!-- Tab 1: Locations -->
+    <div id="tab-locations" class="tab-content">
+      <div class="section-header">
+        <input type="text" class="search-input" id="loc-search" placeholder="Search locations by name or type..." oninput="filterLocations()" />
+        <button class="nav-btn primary" onclick="openAddLocationModal()">+ Add New Location</button>
+      </div>
+      <div class="table-container">
+        <table id="locations-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Map Coords (X, Y)</th>
+              <th>GPS Coordinates</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for loc in locations %}
+            <tr data-name="{{ loc.name|lower }}" data-type="{{ loc.type|lower }}">
+              <td><strong>#{{ loc.id }}</strong></td>
+              <td><strong>{{ loc.name }}</strong></td>
+              <td><span class="badge {{ loc.type }}">{{ loc.get_type_display }}</span></td>
+              <td><code>({{ loc.map_x|floatformat:2 }}, {{ loc.map_y|floatformat:2 }})</code></td>
+              <td><code>{{ loc.latitude|floatformat:4 }}, {{ loc.longitude|floatformat:4 }}</code></td>
+              <td>{{ loc.description|truncatechars:45|default:"—" }}</td>
+              <td>
+                <button class="action-btn" onclick='editLocation({{ loc.to_dict|safe }})'>Edit</button>
+                <button class="action-btn danger" onclick="deleteLocation({{ loc.id }}, '{{ loc.name|escapejs }}')">Delete</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">No campus locations registered yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 2: Pathways -->
+    <div id="tab-pathways" class="tab-content" style="display: none;">
+      <div class="section-header">
+        <input type="text" class="search-input" id="edge-search" placeholder="Search pathways by source or destination..." oninput="filterPathways()" />
+        <button class="nav-btn primary" onclick="openAddPathwayModal()">+ Add New Pathway</button>
+      </div>
+      <div class="table-container">
+        <table id="pathways-table">
+          <thead>
+            <tr>
+              <th>Pathway</th>
+              <th>Distance</th>
+              <th>Path Name</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for edge in edges %}
+            <tr data-src="{{ edge.source.name|lower }}" data-dst="{{ edge.destination.name|lower }}" data-name="{{ edge.path_name|lower }}">
+              <td><strong>{{ edge.source.name }}</strong> &harr; <strong>{{ edge.destination.name }}</strong></td>
+              <td>{{ edge.distance|floatformat:0 }} meters</td>
+              <td>{{ edge.path_name|default:"General Walkway" }}</td>
+              <td>
+                {% if edge.is_blocked %}
+                <span class="badge blocked">Blocked</span>
+                {% else %}
+                <span class="badge open">Open</span>
+                {% endif %}
+              </td>
+              <td>
+                <button class="action-btn toggle" onclick="toggleEdgeBlock({{ edge.id }}, {% if edge.is_blocked %}false{% else %}true{% endif %})">
+                  {% if edge.is_blocked %}Restore Road{% else %}Mark Blocked{% endif %}
+                </button>
+                <button class="action-btn danger" onclick="deletePathway({{ edge.id }})">Remove</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No pathways connecting locations yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Recent Activity -->
+    <div id="tab-activity" class="tab-content" style="display: none;">
+      <div class="section-header">
+        <h3 style="font-size: 15px; font-weight: 600;">Recent Navigation Calculation Logs</h3>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Distance</th>
+              <th>Travel Time</th>
+              <th>Algorithm Latency</th>
+              <th>Avoid Blocked</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in recent_routes %}
+            <tr>
+              <td>{{ r.created_at|date:"Y-m-d H:i:s" }}</td>
+              <td><strong>{{ r.source.name|default:"Unknown" }}</strong></td>
+              <td><strong>{{ r.destination.name|default:"Unknown" }}</strong></td>
+              <td>{{ r.distance|floatformat:0 }} m</td>
+              <td>{{ r.travel_time|floatformat:1 }} s</td>
+              <td><code>{{ r.execution_time_ms|floatformat:3 }} ms</code></td>
+              <td>{% if r.avoid_blocked %}Yes{% else %}No{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">No routes calculated yet. Use the campus map to navigate.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Map Management Tab (injected after activity tab) -->
+  <div id="tab-maps" class="tab-content" style="display: none; padding: 0 28px 28px; max-width: 1360px; margin: 0 auto; width: 100%;">
+    <div class="section-header" style="margin-top: 0;">
+      <h3 style="font-size: 15px; font-weight: 600;">Campus Map Library</h3>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div>
+          <span style="font-size: 12px; color: var(--text-muted);">Download Templates:</span>
+          <a href="/api/maps/template/?format=json" class="template-btn" style="margin-left: 6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            JSON
+          </a>
+          <a href="/api/maps/template/?format=csv" class="template-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            CSV
+          </a>
+          <a href="/api/maps/template/?format=xlsx" class="template-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            XLSX
+          </a>
+        </div>
+        <button class="nav-btn primary" onclick="openUploadModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          Upload Map Data
+        </button>
+      </div>
+    </div>
+
+    <!-- Maps grid loaded dynamically -->
+    <div class="maps-grid" id="maps-grid">
+      <div style="text-align: center; color: var(--text-muted); padding: 40px; grid-column: 1/-1;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity:0.4;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+        <p>Loading campus maps...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Modal -->
+  <div class="modal-overlay" id="loc-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="loc-modal-title">Add Campus Location</h2>
+        <button class="modal-close" onclick="closeLocModal()">&times;</button>
+      </div>
+      <form id="loc-form" onsubmit="handleLocationSubmit(event)">
+        <input type="hidden" id="loc-id" />
+        <div class="form-group">
+          <label for="loc-name">Location Name *</label>
+          <input type="text" id="loc-name" required placeholder="e.g. Science Complex" />
+        </div>
+        <div class="form-group">
+          <label for="loc-type">Category</label>
+          <select id="loc-type">
+            <option value="building">Building</option>
+            <option value="landmark">Landmark</option>
+            <option value="gate">Gate</option>
+            <option value="facility">Facility</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="loc-map-x">Map Canvas X (0.00 - 1.00) *</label>
+            <input type="number" id="loc-map-x" step="0.01" min="0" max="1" value="0.5" required />
+          </div>
+          <div class="form-group">
+            <label for="loc-map-y">Map Canvas Y (0.00 - 1.00) *</label>
+            <input type="number" id="loc-map-y" step="0.01" min="0" max="1" value="0.5" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="loc-lat">Latitude (GPS Reference)</label>
+            <input type="number" id="loc-lat" step="0.0001" value="28.6145" />
+          </div>
+          <div class="form-group">
+            <label for="loc-lng">Longitude (GPS Reference)</label>
+            <input type="number" id="loc-lng" step="0.0001" value="77.2080" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="loc-desc">Description (Optional)</label>
+          <textarea id="loc-desc" rows="2" placeholder="Brief summary of building or facility"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="nav-btn" onclick="closeLocModal()">Cancel</button>
+          <button type="submit" class="nav-btn primary" id="loc-submit-btn">Save Location</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pathway Modal -->
+  <div class="modal-overlay" id="path-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Add Bidirectional Pathway</h2>
+        <button class="modal-close" onclick="closePathModal()">&times;</button>
+      </div>
+      <form id="path-form" onsubmit="handlePathwaySubmit(event)">
+        <div class="form-group">
+          <label for="path-src">Starting Location *</label>
+          <select id="path-src" required>
+            <option value="">Select Origin...</option>
+            {% for loc in locations %}
+            <option value="{{ loc.id }}">{{ loc.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="path-dst">Destination Location *</label>
+          <select id="path-dst" required>
+            <option value="">Select Destination...</option>
+            {% for loc in locations %}
+            <option value="{{ loc.id }}">{{ loc.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="path-dist">Walking Distance (meters) *</label>
+            <input type="number" id="path-dist" step="1" min="1" required placeholder="e.g. 120" />
+          </div>
+          <div class="form-group">
+            <label for="path-name">Pathway Name (Optional)</label>
+            <input type="text" id="path-name" placeholder="e.g. University Promenade" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="nav-btn" onclick="closePathModal()">Cancel</button>
+          <button type="submit" class="nav-btn primary">Create Pathway</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Map Upload Modal -->
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal-card upload-modal-card">
+      <div class="modal-header">
+        <h2>Upload Campus Map Data</h2>
+        <button class="modal-close" onclick="closeUploadModal()">&#x2715;</button>
+      </div>
+
+      <!-- Step indicators -->
+      <div class="upload-steps">
+        <div class="step-indicator active" id="step-1-ind">1 — Select File</div>
+        <div class="step-indicator" id="step-2-ind">2 — Preview & Validate</div>
+        <div class="step-indicator" id="step-3-ind">3 — Confirm Import</div>
+      </div>
+
+      <!-- Step 1: File select -->
+      <div id="upload-step-1">
+        <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('upload-file-input').click()"
+             ondragover="event.preventDefault(); this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="handleFileDrop(event)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          <p><strong>Click to browse</strong> or drag and drop your map file here</p>
+          <p style="font-size: 12px; margin-top: 6px;">Accepts .json, .csv, and .xlsx (max 10 MB)</p>
+          <div class="file-name" id="dropzone-filename" style="display:none;"></div>
+        </div>
+        <input type="file" id="upload-file-input" accept=".json,.csv,.xlsx" onchange="handleFileSelect(this.files[0])" />
+        <div style="margin-top: 14px;">
+          <p style="font-size: 12px; color: var(--text-muted);">Need a template? Download a sample file:</p>
+          <div class="template-btns">
+            <a href="/api/maps/template/?format=json" class="template-btn">📄 JSON Template</a>
+            <a href="/api/maps/template/?format=csv" class="template-btn">📊 CSV Template</a>
+            <a href="/api/maps/template/?format=xlsx" class="template-btn">📗 XLSX Template</a>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="nav-btn" onclick="closeUploadModal()">Cancel</button>
+          <button type="button" class="nav-btn primary" id="preview-btn" onclick="runPreview()" disabled>Preview & Validate →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Preview results -->
+      <div id="upload-step-2" style="display: none;">
+        <div id="validation-output"></div>
+        <div class="modal-footer">
+          <button type="button" class="nav-btn" onclick="goToStep(1)">← Back</button>
+          <button type="button" class="nav-btn primary" id="confirm-btn" onclick="goToStep(3)" disabled>Confirm Import →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirm -->
+      <div id="upload-step-3" style="display: none;">
+        <div class="form-group">
+          <label for="override-map-name">Map Name <small style="color:var(--text-muted);">(edit if desired)</small></label>
+          <input type="text" id="override-map-name" placeholder="University Campus" />
+        </div>
+        <div id="conflict-warning" style="display:none; padding: 12px 16px; background: var(--warning-bg); border: 1px solid #FCD34D; border-radius: 8px; margin-bottom: 14px; font-size: 13px; color: #92400E;">
+          ⚠️ A map with this name already exists. Importing will <strong>replace</strong> it and delete all its locations and pathways.
+        </div>
+        <div id="import-stats" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;"></div>
+        <div class="modal-footer">
+          <button type="button" class="nav-btn" onclick="goToStep(2)">← Back</button>
+          <button type="button" class="nav-btn primary" id="final-import-btn" onclick="commitImport()">
+            ✓ Import Campus Map
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      if (tab === 'locations') {
+        tabBtns[0].classList.add('active');
+        document.getElementById('tab-locations').style.display = 'block';
+      } else if (tab === 'pathways') {
+        tabBtns[1].classList.add('active');
+        document.getElementById('tab-pathways').style.display = 'block';
+      } else if (tab === 'activity') {
+        tabBtns[2].classList.add('active');
+        document.getElementById('tab-activity').style.display = 'block';
+      } else if (tab === 'maps') {
+        tabBtns[3].classList.add('active');
+        document.getElementById('tab-maps').style.display = 'block';
+        loadMapsTab();
+      }
+    }
+
+    function filterLocations() {
+      const q = document.getElementById('loc-search').value.toLowerCase();
+      document.querySelectorAll('#locations-table tbody tr').forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const type = row.getAttribute('data-type') || '';
+        row.style.display = (name.includes(q) || type.includes(q)) ? '' : 'none';
+      });
+    }
+
+    function filterPathways() {
+      const q = document.getElementById('edge-search').value.toLowerCase();
+      document.querySelectorAll('#pathways-table tbody tr').forEach(row => {
+        const src = row.getAttribute('data-src') || '';
+        const dst = row.getAttribute('data-dst') || '';
+        const name = row.getAttribute('data-name') || '';
+        row.style.display = (src.includes(q) || dst.includes(q) || name.includes(q)) ? '' : 'none';
+      });
+    }
+
+    function openAddLocationModal() {
+      document.getElementById('loc-modal-title').textContent = 'Add Campus Location';
+      document.getElementById('loc-id').value = '';
+      document.getElementById('loc-name').value = '';
+      document.getElementById('loc-type').value = 'building';
+      document.getElementById('loc-map-x').value = '0.50';
+      document.getElementById('loc-map-y').value = '0.50';
+      document.getElementById('loc-lat').value = '28.6145';
+      document.getElementById('loc-lng').value = '77.2080';
+      document.getElementById('loc-desc').value = '';
+      document.getElementById('loc-modal').classList.add('active');
+    }
+
+    function editLocation(loc) {
+      document.getElementById('loc-modal-title').textContent = 'Edit Location: ' + loc.name;
+      document.getElementById('loc-id').value = loc.id;
+      document.getElementById('loc-name').value = loc.name;
+      document.getElementById('loc-type').value = loc.type;
+      document.getElementById('loc-map-x').value = loc.x;
+      document.getElementById('loc-map-y').value = loc.y;
+      document.getElementById('loc-lat').value = loc.lat;
+      document.getElementById('loc-lng').value = loc.lng;
+      document.getElementById('loc-desc').value = loc.description || '';
+      document.getElementById('loc-modal').classList.add('active');
+    }
+
+    function closeLocModal() {
+      document.getElementById('loc-modal').classList.remove('active');
+    }
+
+    function openAddPathwayModal() {
+      document.getElementById('path-src').value = '';
+      document.getElementById('path-dst').value = '';
+      document.getElementById('path-dist').value = '';
+      document.getElementById('path-name').value = '';
+      document.getElementById('path-modal').classList.add('active');
+    }
+
+    function closePathModal() {
+      document.getElementById('path-modal').classList.remove('active');
+    }
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    async function handleLocationSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('loc-id').value;
+      const payload = {
+        name: document.getElementById('loc-name').value.trim(),
+        type: document.getElementById('loc-type').value,
+        map_x: parseFloat(document.getElementById('loc-map-x').value),
+        map_y: parseFloat(document.getElementById('loc-map-y').value),
+        lat: parseFloat(document.getElementById('loc-lat').value),
+        lng: parseFloat(document.getElementById('loc-lng').value),
+        description: document.getElementById('loc-desc').value.trim()
+      };
+
+      const url = id ? `/api/locations/${id}/` : '/api/locations/';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save location');
+        showToast(id ? 'Location updated successfully!' : 'Location created successfully!');
+        closeLocModal();
+        setTimeout(() => location.reload(), 600);
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function deleteLocation(id, name) {
+      if (!confirm(`Are you sure you want to delete "${name}"? All connecting pathways will also be removed.`)) return;
+      try {
+        const res = await fetch(`/api/locations/${id}/`, {
+          method: 'DELETE',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+        showToast('Location deleted.');
+        setTimeout(() => location.reload(), 600);
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function handlePathwaySubmit(e) {
+      e.preventDefault();
+      const src = document.getElementById('path-src').value;
+      const dst = document.getElementById('path-dst').value;
+      if (src === dst) {
+        showToast('Origin and Destination cannot be the same.');
+        return;
+      }
+      const payload = {
+        source_id: parseInt(src, 10),
+        destination_id: parseInt(dst, 10),
+        distance: parseFloat(document.getElementById('path-dist').value),
+        path_name: document.getElementById('path-name').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/edges/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create pathway');
+        showToast('Pathway created successfully!');
+        closePathModal();
+        setTimeout(() => location.reload(), 600);
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function toggleEdgeBlock(edgeId, isBlocked) {
+      try {
+        const res = await fetch('/api/toggle-block/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+          body: JSON.stringify({ edge_id: edgeId, is_blocked: isBlocked })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Toggle failed');
+        showToast(isBlocked ? 'Pathway marked as BLOCKED.' : 'Pathway RESTORED to open.');
+        setTimeout(() => location.reload(), 600);
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function deletePathway(edgeId) {
+      if (!confirm('Are you sure you want to remove this pathway? Both directions will be deleted.')) return;
+      try {
+        const res = await fetch(`/api/edges/${edgeId}/`, {
+          method: 'DELETE',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to remove pathway');
+        showToast('Pathway removed.');
+        setTimeout(() => location.reload(), 600);
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    // ================================================================
+    // MAP MANAGEMENT — Upload Modal & Maps Grid
+    // ================================================================
+
+    let _uploadFile = null;
+    let _previewPayload = null;  // stores validated preview data
+
+    function openUploadModal() {
+      _uploadFile = null;
+      _previewPayload = null;
+      document.getElementById('upload-file-input').value = '';
+      document.getElementById('dropzone-filename').style.display = 'none';
+      document.getElementById('preview-btn').disabled = true;
+      document.getElementById('validation-output').innerHTML = '';
+      document.getElementById('conflict-warning').style.display = 'none';
+      document.getElementById('import-stats').textContent = '';
+      document.getElementById('override-map-name').value = '';
+      goToStep(1);
+      document.getElementById('upload-modal').classList.add('active');
+    }
+
+    function closeUploadModal() {
+      document.getElementById('upload-modal').classList.remove('active');
+    }
+
+    function goToStep(n) {
+      [1,2,3].forEach(i => {
+        document.getElementById(`upload-step-${i}`).style.display = i === n ? 'block' : 'none';
+        const ind = document.getElementById(`step-${i}-ind`);
+        ind.classList.remove('active', 'done');
+        if (i < n) ind.classList.add('done');
+        else if (i === n) ind.classList.add('active');
+      });
+    }
+
+    function handleFileSelect(file) {
+      if (!file) return;
+      _uploadFile = file;
+      const fn = document.getElementById('dropzone-filename');
+      fn.textContent = `📎 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      fn.style.display = 'block';
+      document.getElementById('preview-btn').disabled = false;
+    }
+
+    function handleFileDrop(event) {
+      event.preventDefault();
+      document.getElementById('dropzone').classList.remove('drag-over');
+      const file = event.dataTransfer.files[0];
+      if (file) handleFileSelect(file);
+    }
+
+    async function runPreview() {
+      if (!_uploadFile) return;
+      const btn = document.getElementById('preview-btn');
+      btn.disabled = true;
+      btn.textContent = 'Validating...';
+
+      const formData = new FormData();
+      formData.append('file', _uploadFile);
+
+      goToStep(2);
+      document.getElementById('validation-output').innerHTML = '<p style="color:var(--text-muted); font-size:13px;">⏳ Parsing and validating file...</p>';
+
+      try {
+        const res = await fetch('/api/maps/upload-preview/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+          body: formData
+        });
+        const data = await res.json();
+
+        let html = '';
+        if (!data.valid) {
+          html += `<div class="validation-errors"><strong>❌ Validation failed — ${data.errors.length} error(s):</strong><ul>`;
+          data.errors.forEach(e => { html += `<li>${escHtml(e)}</li>`; });
+          html += '</ul></div>';
+          if (data.warnings && data.warnings.length > 0) {
+            html += `<div class="validation-warnings"><strong>⚠️ Warnings (${data.warnings.length}):</strong><ul>`;
+            data.warnings.forEach(w => { html += `<li>${escHtml(w)}</li>`; });
+            html += '</ul></div>';
+          }
+          document.getElementById('confirm-btn').disabled = true;
+        } else {
+          _previewPayload = data;
+          html += `<div style="background:var(--success-bg); border:1px solid #A7F3D0; border-radius:8px; padding:12px 16px; margin-bottom:12px; font-size:13px; color:#065F46;">
+            ✅ <strong>File validated successfully.</strong>
+            &nbsp;|&nbsp; Map: <strong>${escHtml(data.preview.map_name)}</strong>
+            &nbsp;|&nbsp; ${data.stats.total_locations} locations &nbsp;|&nbsp; ${data.stats.total_pathways} pathways
+          </div>`;
+          if (data.warnings && data.warnings.length > 0) {
+            html += `<div class="validation-warnings"><strong>⚠️ ${data.warnings.length} warning(s):</strong><ul>`;
+            data.warnings.forEach(w => { html += `<li>${escHtml(w)}</li>`; });
+            html += '</ul></div>';
+          }
+          // Location preview table
+          html += `<div class="preview-container"><table><thead><tr><th>Name</th><th>Type</th><th>X</th><th>Y</th></tr></thead><tbody>`;
+          data.preview.locations.forEach(l => {
+            html += `<tr><td><strong>${escHtml(l.name)}</strong></td><td>${escHtml(l.type)}</td><td>${l.map_x.toFixed(2)}</td><td>${l.map_y.toFixed(2)}</td></tr>`;
+          });
+          if (data.stats.total_locations > 10) {
+            html += `<tr><td colspan="4" style="color:var(--text-muted); text-align:center;">… and ${data.stats.total_locations - 10} more locations</td></tr>`;
+          }
+          html += `</tbody></table></div>`;
+          document.getElementById('confirm-btn').disabled = false;
+        }
+        document.getElementById('validation-output').innerHTML = html;
+      } catch (err) {
+        document.getElementById('validation-output').innerHTML =
+          `<div class="validation-errors"><strong>⚠️ Request failed:</strong> ${escHtml(err.message)}</div>`;
+        document.getElementById('confirm-btn').disabled = true;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Preview & Validate →';
+      }
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // When going to step 3, fill in the map name from preview
+    const _origGoToStep = goToStep;
+    // Extend step3 entry to pre-fill map name
+    document.getElementById('confirm-btn').addEventListener('click', () => {
+      if (_previewPayload) {
+        document.getElementById('override-map-name').value = _previewPayload.preview.map_name || '';
+        document.getElementById('import-stats').textContent =
+          `Will import ${_previewPayload.stats.total_locations} locations and ${_previewPayload.stats.total_pathways} pathways.`;
+      }
+    });
+
+    async function commitImport() {
+      if (!_uploadFile) return;
+      const btn = document.getElementById('final-import-btn');
+      btn.disabled = true;
+      btn.textContent = 'Importing...';
+
+      const mapName = document.getElementById('override-map-name').value.trim();
+      const formData = new FormData();
+      formData.append('file', _uploadFile);
+      if (mapName) formData.append('map_name', mapName);
+
+      try {
+        // First attempt without replace_existing
+        const res = await fetch('/api/maps/upload-confirm/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+          body: formData
+        });
+        const data = await res.json();
+
+        if (!res.ok && data.conflict) {
+          // Show conflict warning and re-enable with replace flag
+          document.getElementById('conflict-warning').style.display = 'block';
+          btn.textContent = '⚠️ Replace Existing & Import';
+          btn.disabled = false;
+          btn.onclick = () => commitImportWithReplace();
+          return;
+        }
+        if (!res.ok) throw new Error(data.error || 'Import failed');
+
+        showToast(`✅ Map "${data.map.name}" imported successfully! (${data.stats.locations_created} locations, ${data.stats.pathways_created} pathways)`);
+        closeUploadModal();
+        loadMapsTab();
+      } catch (err) {
+        showToast(`❌ ${err.message}`);
+        btn.disabled = false;
+        btn.textContent = '✓ Import Campus Map';
+      }
+    }
+
+    async function commitImportWithReplace() {
+      if (!_uploadFile) return;
+      const btn = document.getElementById('final-import-btn');
+      btn.disabled = true;
+      btn.textContent = 'Replacing & Importing...';
+
+      const mapName = document.getElementById('override-map-name').value.trim();
+      const formData = new FormData();
+      formData.append('file', _uploadFile);
+      if (mapName) formData.append('map_name', mapName);
+      formData.append('replace_existing', 'true');
+
+      try {
+        const res = await fetch('/api/maps/upload-confirm/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Import failed');
+        showToast(`✅ Map "${data.map.name}" replaced and imported!`);
+        closeUploadModal();
+        loadMapsTab();
+      } catch (err) {
+        showToast(`❌ ${err.message}`);
+        btn.disabled = false;
+        btn.textContent = '⚠️ Replace Existing & Import';
+      }
+    }
+
+    async function loadMapsTab() {
+      try {
+        const res = await fetch('/api/maps/');
+        const data = await res.json();
+        const grid = document.getElementById('maps-grid');
+        const badge = document.getElementById('maps-count-badge');
+        if (badge) badge.textContent = data.count;
+
+        if (!data.maps || data.maps.length === 0) {
+          grid.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px;grid-column:1/-1;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.4;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+            <p>No campus maps uploaded yet.</p>
+            <button class="nav-btn primary" onclick="openUploadModal()" style="margin-top:14px;">Upload Your First Map</button>
+          </div>`;
+          return;
+        }
+
+        grid.innerHTML = data.maps.map(m => `
+          <div class="map-card ${m.is_active ? 'active-map' : ''}">
+            ${m.is_active ? '<span class="active-badge">Active</span>' : ''}
+            <div class="map-card-title">${escHtml(m.name)}</div>
+            <div class="map-card-desc">${escHtml(m.description || 'No description')}</div>
+            <div class="map-card-stats">
+              <span>📍 ${m.total_locations} locations</span>
+              <span>🛤 ${m.total_pathways} pathways</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Created: ${m.created_at}</div>
+            <div class="map-card-actions">
+              ${!m.is_active ? `<button class="action-btn toggle" onclick="setActiveMap(${m.id})">Set Active</button>` : ''}
+              ${data.maps.length > 1 ? `<button class="action-btn danger" onclick="deleteMap(${m.id}, '${escHtml(m.name).replace(/'/g,"\\'")}')">Delete</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('maps-grid').innerHTML =
+          `<p style="color:var(--danger);">Failed to load maps: ${escHtml(err.message)}</p>`;
+      }
+    }
+
+    async function setActiveMap(mapId) {
+      try {
+        const res = await fetch(`/api/maps/${mapId}/set-active/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        showToast(`✅ "${data.map.name}" is now the active campus map.`);
+        loadMapsTab();
+      } catch (err) {
+        showToast(`❌ ${err.message}`);
+      }
+    }
+
+    async function deleteMap(mapId, mapName) {
+      if (!confirm(`Delete map "${mapName}" and ALL its locations and pathways? This cannot be undone.`)) return;
+      try {
+        const res = await fetch(`/api/maps/${mapId}/delete/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        showToast(`🗑 Map "${mapName}" deleted.`);
+        loadMapsTab();
+      } catch (err) {
+        showToast(`❌ ${err.message}`);
+      }
+    }
+  </script>
+</body>
+</html>
+

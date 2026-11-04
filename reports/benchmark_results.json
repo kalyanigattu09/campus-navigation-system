@@ -1,0 +1,168 @@
+{
+  "benchmark_suite": "Campus Navigation Dijkstra & Min-Heap Benchmarking Suite",
+  "generated_at": "2026-11-04 06:15:49 UTC",
+  "environment": {
+    "os": "Windows",
+    "os_release": "11",
+    "os_version": "10.0.26200",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "python_version": "3.14.5",
+    "python_implementation": "CPython"
+  },
+  "methodology": {
+    "complexity_guarantee": "O((V + E) log V)",
+    "heap_structure": "Custom Array-Backed BinaryMinHeap with Sift-Up/Sift-Down",
+    "reference_baseline": "Python Standard Library heapq",
+    "scalability_topology": "Deterministic Connected Planar-Geometric Graph (avg degree 4)",
+    "timing_mechanism": "time.perf_counter() with microsecond precision"
+  },
+  "campus_graph_benchmark": {
+    "graph_type": "Production Campus Database",
+    "vertices": 18,
+    "edges": 28,
+    "directed_edges": 56,
+    "density": 0.183,
+    "tested_pairs": 15,
+    "total_queries": 30,
+    "success_rate_percent": 100.0,
+    "latency_custom_heap": {
+      "min_ms": 0.866,
+      "mean_ms": 1.152,
+      "median_ms": 1.051,
+      "p95_ms": 1.496,
+      "p99_ms": 1.746
+    },
+    "latency_reference_heapq": {
+      "min_ms": 0.847,
+      "mean_ms": 1.12,
+      "median_ms": 1.062,
+      "p95_ms": 1.472
+    },
+    "avg_nodes_visited": 8.5,
+    "avg_relaxations": 11.2,
+    "dynamic_rerouting_mean_ms": 4.236
+  },
+  "scalability_benchmarks": [
+    {
+      "vertices": 100,
+      "edges": 200,
+      "density": 0.040404,
+      "trials": 10,
+      "correctness_rate_percent": 100.0,
+      "custom_heap": {
+        "mean_ms": 0.378,
+        "median_ms": 0.376,
+        "p95_ms": 0.941,
+        "min_ms": 0.009,
+        "max_ms": 1.08
+      },
+      "reference_heapq": {
+        "mean_ms": 0.199,
+        "median_ms": 0.178,
+        "p95_ms": 0.517,
+        "min_ms": 0.006,
+        "max_ms": 0.582
+      },
+      "avg_nodes_visited": 37.9,
+      "avg_relaxations": 71.1,
+      "memory_delta_kb": 6.18
+    },
+    {
+      "vertices": 500,
+      "edges": 1000,
+      "density": 0.008016,
+      "trials": 10,
+      "correctness_rate_percent": 100.0,
+      "custom_heap": {
+        "mean_ms": 3.505,
+        "median_ms": 3.413,
+        "p95_ms": 8.001,
+        "min_ms": 0.413,
+        "max_ms": 8.136
+      },
+      "reference_heapq": {
+        "mean_ms": 1.94,
+        "median_ms": 1.964,
+        "p95_ms": 4.254,
+        "min_ms": 0.221,
+        "max_ms": 4.775
+      },
+      "avg_nodes_visited": 182.5,
+      "avg_relaxations": 356.1,
+      "memory_delta_kb": 3.55
+    },
+    {
+      "vertices": 1000,
+      "edges": 2000,
+      "density": 0.004004,
+      "trials": 10,
+      "correctness_rate_percent": 100.0,
+      "custom_heap": {
+        "mean_ms": 16.266,
+        "median_ms": 13.77,
+        "p95_ms": 39.063,
+        "min_ms": 1.493,
+        "max_ms": 53.659
+      },
+      "reference_heapq": {
+        "mean_ms": 7.227,
+        "median_ms": 6.043,
+        "p95_ms": 15.619,
+        "min_ms": 0.806,
+        "max_ms": 17.212
+      },
+      "avg_nodes_visited": 691.5,
+      "avg_relaxations": 1071.5,
+      "memory_delta_kb": 3.94
+    },
+    {
+      "vertices": 5000,
+      "edges": 10000,
+      "density": 0.0008,
+      "trials": 10,
+      "correctness_rate_percent": 100.0,
+      "custom_heap": {
+        "mean_ms": 62.329,
+        "median_ms": 68.146,
+        "p95_ms": 97.196,
+        "min_ms": 9.415,
+        "max_ms": 100.506
+      },
+      "reference_heapq": {
+        "mean_ms": 36.021,
+        "median_ms": 38.286,
+        "p95_ms": 62.356,
+        "min_ms": 7.033,
+        "max_ms": 68.375
+      },
+      "avg_nodes_visited": 2920.4,
+      "avg_relaxations": 4824.7,
+      "memory_delta_kb": 230.44
+    },
+    {
+      "vertices": 10000,
+      "edges": 20000,
+      "density": 0.0004,
+      "trials": 10,
+      "correctness_rate_percent": 100.0,
+      "custom_heap": {
+        "mean_ms": 173.927,
+        "median_ms": 192.653,
+        "p95_ms": 220.21,
+        "min_ms": 8.543,
+        "max_ms": 222.483
+      },
+      "reference_heapq": {
+        "mean_ms": 93.371,
+        "median_ms": 108.173,
+        "p95_ms": 115.168,
+        "min_ms": 3.91,
+        "max_ms": 116.205
+      },
+      "avg_nodes_visited": 6582.7,
+      "avg_relaxations": 10401.2,
+      "memory_delta_kb": 269.42
+    }
+  ]
+}

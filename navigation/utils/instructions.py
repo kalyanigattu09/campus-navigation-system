@@ -1,23 +1,29 @@
-"""Convert a path of Location objects into human-readable turn instructions."""
+"""Convert a sequence of Location objects into clear, non-technical turn-by-turn navigation instructions."""
 from __future__ import annotations
 
 import math
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from navigation.models import Edge, Location
 
 
-def _bearing(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
-    """Compass bearing in degrees (0=N, 90=E, 180=S, 270=W)."""
-    d_lng = lng2 - lng1
-    if d_lng == 0 and lat2 == lat1:
-        return 0.0
-    angle = math.degrees(math.atan2(d_lng, lat2 - lat1))
-    return (angle + 360) % 360
+def _vector_bearing(x1: float, y1: float, x2: float, y2: float) -> Optional[float]:
+    """Calculate bearing in degrees from (x1, y1) to (x2, y2).
+
+    Returns bearing in [0, 360) where 0=North, 90=East, 180=South, 270=West.
+    Returns None if points are collinear or identical.
+    """
+    dx = x2 - x1
+    dy = y2 - y1
+    if abs(dx) < 1e-7 and abs(dy) < 1e-7:
+        return None
+    # math.atan2(dx, dy) produces angle clockwise from north (assuming +y is North, +x is East)
+    angle = math.degrees(math.atan2(dx, dy))
+    return (angle + 360.0) % 360.0
 
 
-def _cardinal(bearing: float) -> str:
-    """Map a bearing in degrees to a cardinal direction phrase."""
+def _cardinal_direction(bearing: float) -> str:
+    """Map bearing degrees to a cardinal direction label."""
     dirs = [
         (22.5, "north"),
         (67.5, "northeast"),
@@ -35,91 +41,122 @@ def _cardinal(bearing: float) -> str:
     return "north"
 
 
-def _turn(prev_bearing: float, new_bearing: float) -> str:
-    """Describe the turn between two bearings."""
-    diff = (new_bearing - prev_bearing + 540) % 360 - 180
-    if abs(diff) < 20:
+def _turn_description(prev_bearing: float, curr_bearing: float) -> str:
+    """Determine turn phrasing based on angle divergence between segments."""
+    diff = (curr_bearing - prev_bearing + 540.0) % 360.0 - 180.0
+    abs_diff = abs(diff)
+
+    if abs_diff < 25:
         return "Continue straight"
-    if abs(diff) < 60:
+    elif abs_diff < 70:
         return "Bear slightly right" if diff > 0 else "Bear slightly left"
-    if abs(diff) < 120:
+    elif abs_diff < 125:
         return "Turn right" if diff > 0 else "Turn left"
-    return "Make a sharp right" if diff > 0 else "Make a sharp left"
+    else:
+        return "Make a sharp right" if diff > 0 else "Make a sharp left"
 
 
-def build_steps(locations: List[Location]) -> List[dict]:
-    """Build turn-by-turn instructions for a path of locations.
+def build_steps(locations: List[Location]) -> List[Dict[str, Any]]:
+    """Generate human-readable, step-by-step navigation instructions.
 
-    Each step is a dict suitable for JSON serialisation:
-        {instruction: str, distance: float, from: str, to: str}
+    Args:
+        locations: Ordered list of Location objects representing the path.
+
+    Returns:
+        List of instruction dictionaries with step number, text, distance,
+        from/to locations, and optional pathway name.
     """
     if not locations:
         return []
 
-    steps: List[dict] = []
+    steps: List[Dict[str, Any]] = []
+    start = locations[0]
 
-    # First step: announce the start.
-    first = locations[0]
-    steps.append(
-        {
-            "step": 1,
-            "instruction": f"Start at {first.name}.",
-            "distance": 0,
-            "from": first.name,
-            "to": first.name,
-            "from_id": first.id,
-            "to_id": first.id,
-        }
-    )
+    # Initial departure instruction
+    steps.append({
+        "step": 1,
+        "instruction": f"Start at {start.name}.",
+        "distance": 0.0,
+        "from": start.name,
+        "to": start.name,
+        "from_id": start.id,
+        "to_id": start.id,
+        "path_name": "",
+        "action": "start",
+    })
 
     if len(locations) == 1:
-        steps.append(
-            {
-                "step": 2,
-                "instruction": "You have arrived.",
-                "distance": 0,
-                "from": first.name,
-                "to": first.name,
-                "from_id": first.id,
-                "to_id": first.id,
-            }
-        )
+        steps.append({
+            "step": 2,
+            "instruction": f"You are already at {start.name}.",
+            "distance": 0.0,
+            "from": start.name,
+            "to": start.name,
+            "from_id": start.id,
+            "to_id": start.id,
+            "path_name": "",
+            "action": "arrive",
+        })
         return steps
 
-    prev_bearing: float | None = None
+    prev_bearing: Optional[float] = None
 
     for i in range(1, len(locations)):
-        prev = locations[i - 1]
-        curr = locations[i]
+        prev_loc = locations[i - 1]
+        curr_loc = locations[i]
+
+        # Retrieve edge connecting previous and current node
         edge = (
-            Edge.objects.filter(source=prev, destination=curr).first()
-            or Edge.objects.filter(source=curr, destination=prev).first()
+            Edge.objects.filter(source=prev_loc, destination=curr_loc).first()
+            or Edge.objects.filter(source=curr_loc, destination=prev_loc).first()
         )
         distance = edge.distance if edge else 0.0
-        bearing = _bearing(prev.latitude, prev.longitude, curr.latitude, curr.longitude)
-        cardinal = _cardinal(bearing)
+        path_name = edge.path_name if (edge and edge.path_name) else ""
 
-        if prev_bearing is None:
-            verb = "Walk"
+        # Determine bearing using real lat/lng if available, falling back to map_x/y
+        bearing: Optional[float] = None
+        if abs(prev_loc.latitude) > 1e-5 or abs(prev_loc.longitude) > 1e-5:
+            bearing = _vector_bearing(
+                prev_loc.longitude, prev_loc.latitude, curr_loc.longitude, curr_loc.latitude
+            )
+        if bearing is None:
+            # Fallback to normalized map layout coordinates
+            bearing = _vector_bearing(prev_loc.map_x, prev_loc.map_y, curr_loc.map_x, curr_loc.map_y)
+
+        # Build turn or movement phrasing
+        path_phrase = f" along {path_name}" if path_name else " along the pathway"
+
+        if bearing is not None:
+            cardinal = f" {_cardinal_direction(bearing)}"
+            if prev_bearing is None:
+                verb = "Walk"
+            else:
+                verb = _turn_description(prev_bearing, bearing)
         else:
-            verb = _turn(prev_bearing, bearing)
+            cardinal = ""
+            verb = "Walk" if prev_bearing is None else "Continue"
 
-        if i == len(locations) - 1:
-            instruction = f"{verb} {distance:.0f}m {cardinal} to {curr.name}. You have arrived."
+        is_last = (i == len(locations) - 1)
+        if is_last:
+            instruction = f"{verb} {distance:.0f}m{cardinal}{path_phrase} to {curr_loc.name}. Arrive at your destination."
+            action = "arrive"
         else:
-            instruction = f"{verb} {distance:.0f}m {cardinal} toward {curr.name}."
+            instruction = f"{verb} {distance:.0f}m{cardinal}{path_phrase} toward {curr_loc.name}."
+            action = "walk"
 
-        steps.append(
-            {
-                "step": i + 1,
-                "instruction": instruction,
-                "distance": distance,
-                "from": prev.name,
-                "to": curr.name,
-                "from_id": prev.id,
-                "to_id": curr.id,
-            }
-        )
-        prev_bearing = bearing
+        steps.append({
+            "step": i + 1,
+            "instruction": instruction,
+            "distance": round(distance, 1),
+            "from": prev_loc.name,
+            "to": curr_loc.name,
+            "from_id": prev_loc.id,
+            "to_id": curr_loc.id,
+            "path_name": path_name,
+            "action": action,
+        })
+
+        if bearing is not None:
+            prev_bearing = bearing
 
     return steps

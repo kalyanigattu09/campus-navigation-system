@@ -1,0 +1,33 @@
+{
+  "$schema_description": "Schema template for importing actual campus navigation data.",
+  "locations": [
+    {
+      "name": "Administration Building",
+      "type": "building",
+      "latitude": 28.6145,
+      "longitude": 77.2080,
+      "map_x": 0.25,
+      "map_y": 0.40,
+      "description": "Main administrative offices and student services."
+    },
+    {
+      "name": "Central Library",
+      "type": "building",
+      "latitude": 28.6152,
+      "longitude": 77.2070,
+      "map_x": 0.45,
+      "map_y": 0.40,
+      "description": "Central university library and study halls."
+    }
+  ],
+  "edges": [
+    {
+      "source": "Administration Building",
+      "destination": "Central Library",
+      "distance": 140.0,
+      "path_name": "University Walkway",
+      "is_blocked": false
+    }
+  ]
+}
+
