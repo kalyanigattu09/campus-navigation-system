@@ -39,17 +39,17 @@ SECRET_KEY = os.environ.get(
 # Debug mode flag controlled via environment
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("true", "1", "yes")
 
-# Allowed hosts configuration (supports Koyeb, Render, and local environments)
+# Allowed hosts configuration (supports Render domain and local environments)
 hosts_env = os.environ.get(
     "DJANGO_ALLOWED_HOSTS",
-    "localhost,127.0.0.1,::1,.koyeb.app,.onrender.com,*",
+    "localhost,127.0.0.1,::1,.onrender.com,*",
 )
 ALLOWED_HOSTS = [h.strip() for h in hosts_env.split(",") if h.strip()]
 
 # CSRF trusted origins for HTTPS deployments (required for form submissions on public domains)
 csrf_env = os.environ.get(
     "CSRF_TRUSTED_ORIGINS",
-    "https://*.koyeb.app,https://*.onrender.com,http://localhost:8000,http://127.0.0.1:8000",
+    "https://*.onrender.com,http://localhost:8000,http://127.0.0.1:8000",
 )
 CSRF_TRUSTED_ORIGINS = [orig.strip() for orig in csrf_env.split(",") if orig.strip()]
 
