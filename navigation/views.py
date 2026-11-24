@@ -884,3 +884,59 @@ def api_map_delete(request: HttpRequest, map_id: int) -> JsonResponse:
         invalidate_graph_cache()
 
     return JsonResponse({"message": f"Map '{name}' and all its data have been deleted.", "success": True})
+
+
+# ---------------------------------------------------------------------------
+# User Registration & Login Views
+# ---------------------------------------------------------------------------
+
+
+def user_login_view(request: HttpRequest):
+    """Handle regular user login (non-admin)."""
+    if request.user.is_authenticated:
+        return redirect("/")
+
+    ctx = {}
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "").strip()
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            return redirect(request.GET.get("next", "/"))
+        ctx["login_error"] = "Invalid username or password. Please try again."
+    return render(request, "navigation/login.html", ctx)
+
+
+def user_register_view(request: HttpRequest):
+    """Handle new user registration."""
+    if request.user.is_authenticated:
+        return redirect("/")
+
+    if request.method == "POST":
+        from django.contrib.auth.models import User as DjangoUser
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "").strip()
+        confirm = request.POST.get("confirm_password", "").strip()
+
+        if not username or not password:
+            return render(request, "navigation/login.html", {"signup_error": "Username and password are required."})
+        if len(password) < 6:
+            return render(request, "navigation/login.html", {"signup_error": "Password must be at least 6 characters."})
+        if password != confirm:
+            return render(request, "navigation/login.html", {"signup_error": "Passwords do not match."})
+        if DjangoUser.objects.filter(username=username).exists():
+            return render(request, "navigation/login.html", {"signup_error": f"Username '{username}' is already taken. Please choose another."})
+
+        user = DjangoUser.objects.create_user(username=username, email=email, password=password)
+        login(request, user)
+        return redirect("/")
+
+    return redirect("/login/?tab=signup")
+
+
+def user_logout_view(request: HttpRequest):
+    """Handle regular user session logout."""
+    logout(request)
+    return redirect("/login/")

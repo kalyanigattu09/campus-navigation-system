@@ -11,6 +11,11 @@ urlpatterns = [
     path("admin-login/", views.admin_login_view, name="admin_login"),
     path("admin-logout/", views.admin_logout_view, name="admin_logout"),
 
+    # User auth
+    path("login/", views.user_login_view, name="user_login"),
+    path("register/", views.user_register_view, name="user_register"),
+    path("logout/", views.user_logout_view, name="user_logout"),
+
     # REST API — Locations
     path("api/locations/", views.api_locations, name="api_locations"),
     path("api/locations/<int:pk>/", views.api_location_detail, name="api_location_detail"),

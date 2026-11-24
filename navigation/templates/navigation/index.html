@@ -646,6 +646,20 @@
         </div>
       </div>
 
+      <!-- User auth bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0;font-size:12px;color:var(--text-muted);">
+        {% if user.is_authenticated %}
+          <span>👤 {{ user.username }}</span>
+          <div style="display:flex;gap:8px;">
+            {% if is_admin %}<a href="/dashboard/" style="color:var(--primary);text-decoration:none;">Dashboard</a>{% endif %}
+            <a href="/logout/" style="color:var(--text-muted);text-decoration:none;" onmouseover="this.style.color='#FC8181'" onmouseout="this.style.color='var(--text-muted)'">Sign Out</a>
+          </div>
+        {% else %}
+          <span>👤 Guest</span>
+          <a href="/login/" style="color:var(--primary);text-decoration:none;font-weight:600;">Sign In / Register</a>
+        {% endif %}
+      </div>
+
       <!-- Demo hero banner -->
       <div class="demo-hero-banner">
         <div class="demo-banner-label"><span></span>Sample University Map Loaded</div>
@@ -1016,12 +1030,17 @@
     // Demo Route — auto-selects North Gate → Computer Science Wing
     // ---------------------------------------------------------------------------
     function runDemoRoute() {
+      // If data not loaded yet, wait for init then retry automatically
       if (state.locations.length < 2) {
-        showToast('No campus data loaded yet.');
+        showToast('Loading campus data, please wait…');
+        init().then(() => {
+          if (state.locations.length >= 2) runDemoRoute();
+          else showToast('No campus data found. Please refresh.');
+        });
         return;
       }
       const demoSrc = state.locations.find(l => l.name.toLowerCase().includes('north gate') || l.name.toLowerCase().includes('gate'));
-      const demoDst = state.locations.find(l => l.name.toLowerCase().includes('computer') || l.name.toLowerCase().includes('cs') || l.name.toLowerCase().includes('south gate') || l.name.toLowerCase().includes('gate') && l.id !== (demoSrc && demoSrc.id));
+      const demoDst = state.locations.find(l => (l.name.toLowerCase().includes('computer') || l.name.toLowerCase().includes('cs') || l.name.toLowerCase().includes('south gate')) && l.id !== (demoSrc && demoSrc.id));
       const src = demoSrc || state.locations[0];
       const dst = demoDst || state.locations[state.locations.length - 1];
 

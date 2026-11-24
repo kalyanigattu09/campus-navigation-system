@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Campus Navigation</title>
+  <style>
+    :root {
+      --bg: #0D1B2A;
+      --card: #132236;
+      --border: rgba(99,179,237,0.2);
+      --primary: #3B82F6;
+      --accent: #8B5CF6;
+      --success: #10B981;
+      --danger: #FC8181;
+      --danger-bg: rgba(252,129,129,0.12);
+      --text: #E2E8F0;
+      --muted: #94A3B8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #0D1B2A 0%, #0a1628 60%, #0f2040 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    /* Animated background blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #3B82F6, transparent);
+      top: -100px; left: -100px;
+      animation: float1 8s ease-in-out infinite;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #8B5CF6, transparent);
+      bottom: -100px; right: -100px;
+      animation: float2 10s ease-in-out infinite;
+    }
+    @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,-30px)} }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    /* Brand header */
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .brand-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+    }
+    .brand-icon svg { width: 28px; height: 28px; color: #fff; }
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E2E8F0, #94A3B8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+
+    /* Form panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .form-group { margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input::placeholder { color: rgba(148,163,184,0.5); }
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.02em;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .alert {
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .alert-error { background: var(--danger-bg); border: 1px solid rgba(252,129,129,0.3); color: var(--danger); }
+    .alert-success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #34D399; }
+
+    /* Demo card */
+    .demo-card {
+      background: linear-gradient(135deg, rgba(16,185,129,0.10), rgba(59,130,246,0.10));
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .demo-info { font-size: 13px; }
+    .demo-info .label { font-size: 11px; font-weight: 700; color: #34D399; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+    .demo-cred { display: flex; gap: 16px; flex-wrap: wrap; }
+    .demo-cred span { font-size: 12px; color: var(--muted); }
+    .demo-cred code { font-size: 13px; color: #A5F3FC; font-family: "SF Mono","Fira Code",monospace; background: rgba(165,243,252,0.08); padding: 1px 7px; border-radius: 4px; }
+    .autofill-btn {
+      background: linear-gradient(135deg, #10B981, #3B82F6);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .autofill-btn:hover { opacity: 0.85; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .guest-btn {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .guest-btn:hover { border-color: var(--primary); color: var(--text); background: rgba(59,130,246,0.08); }
+
+    .footer-links {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .footer-links a {
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--primary); }
+
+    .pwd-strength { margin-top: 6px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .pwd-bar { height: 100%; width: 0; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+        <line x1="9" y1="3" x2="9" y2="18"></line>
+        <line x1="15" y1="6" x2="15" y2="21"></line>
+      </svg>
+    </div>
+    <h1>Campus Navigation</h1>
+    <p>Smart pathfinding for your campus</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+
+    <!-- Demo credentials banner -->
+    <div class="demo-card">
+      <div class="demo-info">
+        <div class="label">🎯 Try the Demo</div>
+        <div class="demo-cred">
+          <span>User: <code>demo</code></span>
+          <span>Pass: <code>demo1234</code></span>
+        </div>
+      </div>
+      <button class="autofill-btn" onclick="autofillDemo()">⚡ Auto-fill</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Sign In Panel -->
+    <div class="panel active" id="panel-signin">
+      {% if login_error %}
+      <div class="alert alert-error">{{ login_error }}</div>
+      {% endif %}
+      {% if success_message %}
+      <div class="alert alert-success">{{ success_message }}</div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'user_login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="login" />
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" name="username" required autofocus placeholder="Enter your username" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="submit-btn">Sign In →</button>
+      </form>
+
+      <div class="divider">or</div>
+      <button class="guest-btn" onclick="window.location.href='/'">🗺 Continue as Guest</button>
+    </div>
+
+    <!-- Sign Up Panel -->
+    <div class="panel" id="panel-signup">
+      {% if signup_error %}
+      <div class="alert alert-error">{{ signup_error }}</div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'user_register' %}">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="register" />
+        <div class="form-group">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" name="username" required placeholder="Choose a username" />
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email (optional)</label>
+          <input type="email" id="reg-email" name="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" name="password" required placeholder="Min 6 characters" oninput="checkStrength(this.value)" />
+          <div class="pwd-strength"><div class="pwd-bar" id="pwd-bar"></div></div>
+        </div>
+        <div class="form-group">
+          <label for="reg-confirm">Confirm Password</label>
+          <input type="password" id="reg-confirm" name="confirm_password" required placeholder="Repeat password" />
+        </div>
+        <button type="submit" class="submit-btn">Create Account →</button>
+      </form>
+
+      <div class="divider">or</div>
+      <button class="guest-btn" onclick="window.location.href='/'">🗺 Continue as Guest</button>
+    </div>
+
+  </div><!-- /card -->
+
+  <div class="footer-links">
+    <a href="/">← Back to Campus Map</a>
+    &nbsp;·&nbsp;
+    <a href="/admin-login/">Admin Portal</a>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+  // Switch between Sign In / Create Account tabs
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  // Auto-fill demo credentials
+  function autofillDemo() {
+    switchTab('signin');
+    document.getElementById('login-username').value = 'demo';
+    document.getElementById('login-password').value = 'demo1234';
+    const btn = event.target;
+    btn.textContent = '✓ Done!';
+    setTimeout(() => { btn.textContent = '⚡ Auto-fill'; }, 1500);
+  }
+
+  // Password strength indicator
+  function checkStrength(val) {
+    const bar = document.getElementById('pwd-bar');
+    let score = 0;
+    if (val.length >= 6) score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const colors = ['#FC8181','#FBBF24','#FBBF24','#34D399','#10B981'];
+    bar.style.width = (score * 20) + '%';
+    bar.style.background = colors[score - 1] || '#FC8181';
+  }
+
+  // If URL has ?tab=signup, switch to signup
+  if (new URLSearchParams(location.search).get('tab') === 'signup') {
+    switchTab('signup');
+  }
+  // If redirect after registration error, stay on signup
+  {% if signup_error %}switchTab('signup');{% endif %}
+</script>
+</body>
+</html>
