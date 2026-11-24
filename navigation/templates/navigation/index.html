@@ -6,26 +6,29 @@
   <title>Campus Navigation System — Smart Route Finder</title>
   <style>
     :root {
-      --bg: #F8FAFC;
-      --panel: #FFFFFF;
-      --border: #E2E8F0;
-      --border-dark: #CBD5E1;
-      --primary: #2563EB;
-      --primary-hover: #1D4ED8;
-      --primary-light: #EFF6FF;
-      --secondary: #6366F1;
-      --text: #0F172A;
-      --text-muted: #64748B;
-      --text-subtle: #94A3B8;
+      --bg: #0D1B2A;
+      --bg2: #0A1628;
+      --panel: rgba(15, 28, 50, 0.92);
+      --panel-solid: #0F1C32;
+      --border: rgba(99, 143, 196, 0.18);
+      --border-bright: rgba(99, 143, 196, 0.35);
+      --primary: #3B82F6;
+      --primary-hover: #2563EB;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent: #8B5CF6;
+      --accent2: #06B6D4;
       --success: #10B981;
-      --success-bg: #ECFDF5;
+      --success-bg: rgba(16, 185, 129, 0.12);
       --warning: #F59E0B;
-      --warning-bg: #FFFBEB;
-      --danger: #EF4444;
-      --danger-bg: #FEF2F2;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --warning-bg: rgba(245, 158, 11, 0.12);
+      --danger: #F87171;
+      --danger-bg: rgba(248, 113, 113, 0.12);
+      --text: #E8F0FE;
+      --text-muted: #8BA3C7;
+      --text-subtle: #4A6080;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
@@ -49,7 +52,7 @@
     }
 
     /* -----------------------------------------------------------------------
-       Sidebar (Navigation & Controls)
+       Sidebar
     ----------------------------------------------------------------------- */
     .sidebar {
       width: 400px;
@@ -57,311 +60,136 @@
       max-width: 440px;
       height: 100vh;
       background: var(--panel);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       z-index: 20;
-      box-shadow: var(--shadow-md);
-      transition: transform 0.3s ease;
+      box-shadow: 4px 0 32px rgba(0,0,0,0.5);
     }
 
     .sidebar-header {
       padding: 18px 22px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: rgba(10, 20, 40, 0.5);
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
     .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--primary);
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
       color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
     }
-    .brand-icon svg { width: 20px; height: 20px; }
+    .brand-icon svg { width: 22px; height: 22px; }
     .brand-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
+      font-size: 16px; font-weight: 700;
+      background: linear-gradient(90deg, #E8F0FE, #93C5FD);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
       letter-spacing: -0.3px;
     }
-    .brand-badge {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 500;
+    .brand-badge { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+    /* Demo Banner in sidebar */
+    .demo-hero-banner {
+      margin: 16px 20px 0 20px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
     }
+    .demo-hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%);
+      border-radius: 50%;
+    }
+    .demo-banner-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #93C5FD;
+      display: flex; align-items: center; gap: 5px; margin-bottom: 5px;
+    }
+    .demo-banner-label span { width: 6px; height: 6px; background: #3B82F6; border-radius: 50%; display: inline-block; }
+    .demo-banner-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+    .demo-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .demo-route-btn {
+      padding: 7px 13px; font-size: 12px; font-weight: 600;
+      background: linear-gradient(135deg, #3B82F6, #6366F1);
+      color: #fff; border: none; border-radius: 7px;
+      cursor: pointer; transition: opacity 0.2s ease;
+      box-shadow: 0 2px 10px rgba(59,130,246,0.4);
+    }
+    .demo-route-btn:hover { opacity: 0.85; }
+    .demo-upload-btn {
+      padding: 7px 13px; font-size: 12px; font-weight: 600;
+      background: rgba(255,255,255,0.08); color: var(--text-muted);
+      border: 1px solid var(--border-bright); border-radius: 7px;
+      cursor: pointer; transition: all 0.2s ease;
+      text-decoration: none; display: inline-block;
+    }
+    .demo-upload-btn:hover { background: rgba(255,255,255,0.14); color: var(--text); }
 
     .sidebar-content {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
+      padding: 16px 20px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .sidebar-content::-webkit-scrollbar { width: 4px; }
+    .sidebar-content::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Section labels */
+    .section-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-subtle); margin-bottom: 8px;
     }
 
-    /* Route Selection Form */
-    .directions-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-    }
-    .input-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-      position: relative;
-    }
-    .input-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .input-icon.origin {
-      background: #DBEAFE;
-      color: var(--primary);
-    }
-    .input-icon.destination {
-      background: #FEE2E2;
-      color: var(--danger);
-    }
-    .select-wrap {
-      flex: 1;
-      position: relative;
-    }
-    select.nav-select {
-      width: 100%;
-      padding: 9px 12px;
-      font-size: 13px;
-      font-weight: 500;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      outline: none;
-      color: var(--text);
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-    }
-    select.nav-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-light);
-    }
-
-    .swap-btn {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #fff;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      z-index: 2;
-    }
-    .swap-btn:hover { background: #F1F5F9; }
-
-    .route-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0 12px 0;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .toggle-label input { cursor: pointer; }
-
-    .action-row {
-      display: flex;
-      gap: 8px;
-    }
-    button.btn-primary {
-      flex: 1;
-      padding: 10px 16px;
-      background: var(--primary);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.15s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    button.btn-primary:hover { background: var(--primary-hover); }
-    button.btn-secondary {
-      padding: 10px 14px;
-      background: #fff;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 500;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button.btn-secondary:hover { background: #F1F5F9; color: var(--text); }
-
-    /* Route Summary & Directions */
-    .route-result-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      display: none;
-      box-shadow: var(--shadow-sm);
-    }
-    .route-result-card.active { display: block; }
-    .metrics-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 14px;
-    }
-    .metric-main {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .metric-unit {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-    .metric-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .alt-route-banner {
-      background: var(--warning-bg);
-      border: 1px solid #FDE68A;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-    }
-    .alt-route-btn {
-      padding: 4px 10px;
-      background: #fff;
-      border: 1px solid #F59E0B;
-      color: #B45309;
-      font-size: 11px;
-      font-weight: 600;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .instructions-list {
-      margin-top: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 280px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .instruction-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: #F8FAFC;
-      border: 1px solid var(--border);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-    .step-num {
-      width: 22px;
-      height: 22px;
-      background: var(--primary-light);
-      color: var(--primary);
-      border-radius: 50%;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .step-text { flex: 1; }
-    .step-dist {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-family: var(--mono);
-      white-space: nowrap;
-    }
-
-    /* Quick Search Accordion */
+    /* Search box */
     .search-box {
       position: relative;
     }
     .search-input {
       width: 100%;
-      padding: 10px 14px 10px 36px;
+      padding: 10px 12px 10px 36px;
       font-size: 13px;
+      background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 9px;
       outline: none;
-      background: #fff;
+      color: var(--text);
+      transition: border-color 0.15s ease, background 0.15s ease;
     }
-    .search-input:focus { border-color: var(--primary); }
+    .search-input::placeholder { color: var(--text-subtle); }
+    .search-input:focus {
+      border-color: var(--primary);
+      background: rgba(59,130,246,0.07);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
     .search-icon {
       position: absolute;
-      left: 12px;
-      top: 50%;
+      left: 11px; top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
-      width: 15px;
-      height: 15px;
+      color: var(--text-subtle);
+      width: 15px; height: 15px;
     }
     .search-results {
       position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      top: calc(100% + 4px); left: 0; right: 0;
+      background: #111E35;
+      border: 1px solid var(--border-bright);
+      border-radius: 9px;
       box-shadow: var(--shadow-lg);
       max-height: 220px;
       overflow-y: auto;
@@ -370,283 +198,432 @@
     }
     .search-results.active { display: block; }
     .search-item {
-      padding: 9px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      cursor: pointer;
-      border-bottom: 1px solid #F1F5F9;
+      padding: 9px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
     }
-    .search-item:hover { background: #F8FAFC; }
+    .search-item:hover { background: rgba(59,130,246,0.1); }
     .search-item:last-child { border-bottom: none; }
 
-    /* Blocked Roads Accordion */
-    .block-card {
+    /* Directions card */
+    .directions-card {
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .input-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px; position: relative;
+    }
+    .input-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+    .input-icon.origin { background: rgba(59,130,246,0.2); color: #60A5FA; }
+    .input-icon.destination { background: rgba(248,113,113,0.2); color: #F87171; }
+
+    .select-wrap { flex: 1; position: relative; }
+    select.nav-select {
+      width: 100%;
+      padding: 9px 32px 9px 12px;
+      font-size: 13px; font-weight: 500;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238BA3C7' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: border-color 0.15s ease;
+    }
+    select.nav-select option { background: #111E35; color: var(--text); }
+    select.nav-select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+
+    .swap-btn {
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: var(--shadow-sm); z-index: 2;
+      color: var(--text-muted);
+    }
+    .swap-btn:hover { background: rgba(59,130,246,0.15); color: var(--primary); }
+
+    .route-options {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0 12px 0;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .toggle-label { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+    .toggle-label input { cursor: pointer; accent-color: var(--primary); }
+
+    .action-row { display: flex; gap: 8px; }
+    button.btn-primary {
+      flex: 1; padding: 10px 16px;
+      background: linear-gradient(135deg, #3B82F6, #6366F1);
+      color: #fff; font-size: 13px; font-weight: 600;
+      border: none; border-radius: 8px;
+      cursor: pointer; transition: opacity 0.15s ease;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+    }
+    button.btn-primary:hover { opacity: 0.88; }
+    button.btn-secondary {
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.07);
+      color: var(--text-muted); font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    button.btn-secondary:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+    /* Route result card */
+    .route-result-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px;
+      display: none;
+    }
+    .route-result-card.active { display: block; }
+    .metrics-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .metric-main {
+      font-size: 32px; font-weight: 800;
+      background: linear-gradient(90deg, #60A5FA, #A78BFA);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    .metric-unit { font-size: 16px; font-weight: 500; }
+    .metric-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    .algo-metrics-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; margin-bottom: 14px;
+    }
+    .algo-metric-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 10px;
+      text-align: center;
+    }
+    .algo-metric-val { font-size: 18px; font-weight: 700; color: var(--accent2); }
+    .algo-metric-label { font-size: 10px; color: var(--text-subtle); margin-top: 2px; }
+
+    .alt-route-banner {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 8px; padding: 10px 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px;
+      font-size: 13px; color: #FCD34D;
+    }
+    .alt-route-btn {
+      padding: 5px 10px;
+      background: rgba(245,158,11,0.2); color: #FCD34D;
+      border: 1px solid rgba(245,158,11,0.4);
+      border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+    .alt-route-btn:hover { background: rgba(245,158,11,0.3); }
+
+    .instructions-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .step-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); border-radius: 8px;
+    }
+    .step-num {
+      width: 22px; height: 22px; background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 50%; font-size: 10px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .step-text { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .step-dist { font-size: 10px; color: var(--text-subtle); margin-top: 2px; }
+
+    /* Blocked pathways accordion */
+    .block-card {
+      border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+      background: rgba(255,255,255,0.02);
     }
     .block-header {
       padding: 12px 16px;
-      background: #F8FAFC;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
+      background: rgba(255,255,255,0.04);
+      font-size: 13px; font-weight: 600; color: var(--text);
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; user-select: none;
     }
     .block-list {
-      padding: 10px;
-      max-height: 160px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      padding: 10px; max-height: 160px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 6px;
     }
     .block-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
       padding: 6px 10px;
-      background: #F8FAFC;
-      border-radius: 6px;
-      font-size: 12px;
+      background: rgba(255,255,255,0.03); border-radius: 6px;
+      font-size: 12px; color: var(--text-muted);
     }
 
-    /* Footer links */
+    /* Upload map CTA card */
+    .upload-map-cta {
+      background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(139,92,246,0.1));
+      border: 1px solid rgba(6,182,212,0.25);
+      border-radius: 12px; padding: 16px;
+    }
+    .upload-cta-title {
+      font-size: 13px; font-weight: 700; color: #67E8F9; margin-bottom: 5px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .upload-cta-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+    .upload-cta-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cta-btn-primary {
+      padding: 8px 14px; font-size: 12px; font-weight: 600;
+      background: linear-gradient(135deg, #06B6D4, #8B5CF6);
+      color: #fff; border: none; border-radius: 7px; cursor: pointer;
+      text-decoration: none; display: inline-block;
+      box-shadow: 0 2px 10px rgba(6,182,212,0.3);
+    }
+    .cta-btn-primary:hover { opacity: 0.85; }
+    .cta-btn-ghost {
+      padding: 8px 14px; font-size: 12px; font-weight: 600;
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); border-radius: 7px; cursor: pointer;
+      text-decoration: none; display: inline-block;
+    }
+    .cta-btn-ghost:hover { border-color: var(--border-bright); color: var(--text); }
+
+    /* Sidebar footer */
     .sidebar-footer {
-      padding: 16px 20px;
+      padding: 14px 20px;
       border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text-muted);
-      background: #FAFAFA;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--text-subtle);
+      background: rgba(0,0,0,0.2);
     }
-    .sidebar-footer a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-    }
+    .sidebar-footer a { color: var(--text-muted); text-decoration: none; font-weight: 500; }
     .sidebar-footer a:hover { color: var(--primary); }
 
     /* -----------------------------------------------------------------------
        Map Area
     ----------------------------------------------------------------------- */
     .map-container {
-      flex: 1;
-      height: 100vh;
-      position: relative;
-      background: #F1F5F9;
+      flex: 1; height: 100vh; position: relative;
       overflow: hidden;
+      background: radial-gradient(ellipse at 30% 20%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%),
+                  linear-gradient(160deg, #0A1628 0%, #0D1B2A 50%, #0A1628 100%);
     }
     canvas#campus-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
+      width: 100%; height: 100%; display: block;
       cursor: grab;
     }
     canvas#campus-canvas:active { cursor: grabbing; }
 
-    /* Floating Top Status */
+    /* Top status bar */
     .top-status-bar {
-      position: absolute;
-      top: 18px;
-      left: 20px;
-      right: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-      z-index: 10;
+      position: absolute; top: 18px; left: 20px; right: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      pointer-events: none; z-index: 10;
     }
     .network-badge {
       pointer-events: auto;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 7px 16px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text);
+      background: rgba(10, 20, 40, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-bright);
+      border-radius: 20px; padding: 7px 16px;
+      font-size: 12px; font-weight: 500; color: var(--text-muted);
       box-shadow: var(--shadow-sm);
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      display: flex; align-items: center; gap: 10px;
     }
+    .network-badge strong { color: var(--text); }
     .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--success);
-      border-radius: 50%;
+      width: 8px; height: 8px;
+      background: var(--success); border-radius: 50%;
       display: inline-block;
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.25);
+      animation: pulse-anim 2s infinite;
+    }
+    @keyframes pulse-anim {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.25); }
+      50% { box-shadow: 0 0 0 6px rgba(16,185,129,0.1); }
     }
 
-    .top-right-links {
-      pointer-events: auto;
-      display: flex;
-      gap: 10px;
-    }
+    .top-right-links { pointer-events: auto; display: flex; gap: 10px; }
     .map-link-btn {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 14px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      text-decoration: none;
+      background: rgba(10, 20, 40, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-bright);
+      border-radius: 8px; padding: 7px 14px;
+      font-size: 12px; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.15s ease;
       box-shadow: var(--shadow-sm);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
-    .map-link-btn:hover { background: #fff; color: var(--primary); }
+    .map-link-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(59,130,246,0.1); }
 
-    /* Map Controls (Zoom, Pan, Reset) */
+    /* Map controls */
     .map-controls {
-      position: absolute;
-      bottom: 24px;
-      right: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 10;
+      position: absolute; bottom: 24px; right: 20px;
+      display: flex; flex-direction: column; gap: 4px; z-index: 10;
     }
     .ctrl-btn {
-      width: 38px;
-      height: 38px;
-      background: #fff;
-      border: 1px solid var(--border);
+      width: 36px; height: 36px;
+      background: rgba(10, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-bright);
       border-radius: 8px;
-      box-shadow: var(--shadow-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text);
-      font-size: 16px;
-      font-weight: 600;
-      transition: all 0.15s ease;
+      font-size: 18px; font-weight: 300; color: var(--text-muted);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s ease; box-shadow: var(--shadow-sm);
     }
-    .ctrl-btn:hover { background: #F8FAFC; color: var(--primary); }
+    .ctrl-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(59,130,246,0.1); }
 
-    /* Dijkstra Visualizer Toolbar */
+    /* Dijkstra Visualizer bar */
     .viz-bar {
-      position: absolute;
-      bottom: 24px;
-      left: 24px;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 16px;
+      position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+      background: rgba(10, 20, 40, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-bright);
+      border-radius: 12px; padding: 10px 18px;
       box-shadow: var(--shadow-lg);
-      display: none;
-      align-items: center;
-      gap: 14px;
-      z-index: 15;
+      display: none; align-items: center; gap: 14px; z-index: 15;
     }
     .viz-bar.active { display: flex; }
     .viz-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: 11px; font-weight: 700; color: var(--accent2);
+      text-transform: uppercase; letter-spacing: 0.8px;
     }
     .viz-btn {
       padding: 6px 12px;
-      background: #F1F5F9;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border); border-radius: 6px;
+      font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-muted);
     }
-    .viz-btn:hover { background: #E2E8F0; }
+    .viz-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
     .viz-btn.play {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 2px 8px var(--primary-glow);
     }
-    .viz-status {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: var(--mono);
-    }
+    .viz-status { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
 
     /* Tooltip */
     .map-tooltip {
       position: absolute;
-      background: #0F172A;
-      color: #fff;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 12px;
-      pointer-events: none;
-      box-shadow: var(--shadow-lg);
-      z-index: 25;
-      display: none;
-      max-width: 220px;
+      background: rgba(5, 15, 30, 0.97);
+      border: 1px solid var(--border-bright);
+      color: var(--text);
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 12px; pointer-events: none;
+      box-shadow: var(--shadow-lg); z-index: 25;
+      display: none; max-width: 240px;
     }
-    .tooltip-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
-    .tooltip-type { font-size: 11px; color: #94A3B8; text-transform: uppercase; }
+    .tooltip-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; color: #E8F0FE; }
+    .tooltip-type {
+      font-size: 10px; color: var(--accent2);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
 
     /* Empty state overlay */
     .empty-map-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(248, 250, 252, 0.95);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 18;
-      padding: 24px;
-      text-align: center;
+      position: absolute; inset: 0;
+      background: rgba(10, 20, 40, 0.92);
+      backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 18; padding: 24px; text-align: center;
     }
     .empty-map-overlay.active { display: flex; }
+    .empty-map-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
     .empty-map-overlay h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 8px;
+      font-size: 20px; font-weight: 700;
+      background: linear-gradient(90deg, #E8F0FE, #93C5FD);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
     }
-    .empty-map-overlay p {
-      font-size: 14px;
-      color: var(--text-muted);
-      max-width: 440px;
-      margin-bottom: 20px;
-    }
+    .empty-map-overlay p { font-size: 14px; color: var(--text-muted); max-width: 440px; margin-bottom: 24px; line-height: 1.6; }
+    .empty-cta-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
-    /* Toast notification */
+    /* Toast */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
+      position: fixed; bottom: 24px; right: 24px;
       padding: 12px 18px;
-      background: #0F172A;
-      color: #fff;
-      font-size: 13px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      opacity: 0;
-      transform: translateY(10px);
+      background: rgba(10, 20, 40, 0.98);
+      border: 1px solid var(--border-bright);
+      color: var(--text); font-size: 13px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      opacity: 0; transform: translateY(10px);
       transition: all 0.25s ease;
-      pointer-events: none;
-      z-index: 300;
+      pointer-events: none; z-index: 300;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Upload modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(5, 10, 25, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: #0F1C32;
+      border: 1px solid var(--border-bright);
+      border-radius: 16px; padding: 32px;
+      width: 90%; max-width: 520px;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-title {
+      font-size: 18px; font-weight: 700;
+      background: linear-gradient(90deg, #67E8F9, #A78BFA);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .modal-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+    .upload-zone {
+      border: 2px dashed var(--border-bright);
+      border-radius: 12px; padding: 32px 24px;
+      text-align: center; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .upload-zone:hover { border-color: var(--primary); background: rgba(59,130,246,0.05); }
+    .upload-zone p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+    .upload-zone strong { color: var(--primary); }
+    .modal-btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; }
+    .modal-close:hover { color: var(--text); }
+    .upload-formats { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .format-pill {
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      background: rgba(6,182,212,0.12); color: var(--accent2); border: 1px solid rgba(6,182,212,0.25);
+    }
+    .template-links { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+    .template-link { font-size: 12px; color: var(--primary); text-decoration: none; cursor: pointer; }
+    .template-link:hover { text-decoration: underline; }
+    .upload-status { margin-top: 14px; font-size: 13px; color: var(--text-muted); min-height: 20px; }
+    .upload-status.ok { color: var(--success); }
+    .upload-status.err { color: var(--danger); }
+
+    /* Algo badge in header */
+    .algo-badge {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--text-subtle);
+    }
+    .algo-badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -664,92 +641,124 @@
           </div>
           <div>
             <div class="brand-name">Campus Navigator</div>
-            <div class="brand-badge">Optimal Pathfinding Engine</div>
+            <div class="brand-badge">Dijkstra · O((V+E)log V)</div>
           </div>
         </div>
       </div>
 
+      <!-- Demo hero banner -->
+      <div class="demo-hero-banner">
+        <div class="demo-banner-label"><span></span>Sample University Map Loaded</div>
+        <div class="demo-banner-title">Try the interactive demo or upload your own campus map</div>
+        <div class="demo-btn-row">
+          <button class="demo-route-btn" onclick="runDemoRoute()">▶ Run Demo Route</button>
+          <button class="demo-upload-btn" onclick="openUploadModal()">⬆ Upload Your Map</button>
+        </div>
+      </div>
+
       <div class="sidebar-content">
-        <!-- Search bar -->
-        <div class="search-box">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" class="search-input" id="quick-search" placeholder="Search building, hall, facility..." oninput="handleSearch(this.value)" />
-          <div class="search-results" id="search-results"></div>
+        <!-- Search -->
+        <div>
+          <div class="section-label">Quick Search</div>
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="search-input" id="quick-search"
+              placeholder="Search building, hall, facility..."
+              oninput="handleSearch(this.value)" />
+            <div class="search-results" id="search-results"></div>
+          </div>
         </div>
 
         <!-- Directions Form -->
-        <div class="directions-card">
-          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 12px;">Get Directions</div>
-
-          <div class="input-row">
-            <div class="input-icon origin">A</div>
-            <div class="select-wrap">
-              <select class="nav-select" id="src-select" onchange="state.srcId = parseInt(this.value, 10); draw();">
-                <option value="">Choose Starting Point...</option>
-              </select>
+        <div>
+          <div class="section-label">Get Directions</div>
+          <div class="directions-card">
+            <div class="input-row">
+              <div class="input-icon origin">A</div>
+              <div class="select-wrap">
+                <select class="nav-select" id="src-select" onchange="state.srcId = parseInt(this.value, 10); draw();">
+                  <option value="">Choose Starting Point...</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div style="position: relative; height: 10px; margin-bottom: 12px;">
-            <button class="swap-btn" onclick="swapLocations()" title="Swap origin & destination">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <polyline points="19 12 12 19 5 12"></polyline>
-              </svg>
-            </button>
-          </div>
-
-          <div class="input-row">
-            <div class="input-icon destination">B</div>
-            <div class="select-wrap">
-              <select class="nav-select" id="dst-select" onchange="state.dstId = parseInt(this.value, 10); draw();">
-                <option value="">Choose Destination...</option>
-              </select>
+            <div style="position: relative; height: 10px; margin-bottom: 10px;">
+              <button class="swap-btn" onclick="swapLocations()" title="Swap origin &amp; destination">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+              </button>
             </div>
-          </div>
 
-          <div class="route-options">
-            <label class="toggle-label">
-              <input type="checkbox" id="avoid-blocked-toggle" checked onchange="state.avoidBlocked = this.checked;" />
-              Avoid blocked pathways
-            </label>
-          </div>
+            <div class="input-row">
+              <div class="input-icon destination">B</div>
+              <div class="select-wrap">
+                <select class="nav-select" id="dst-select" onchange="state.dstId = parseInt(this.value, 10); draw();">
+                  <option value="">Choose Destination...</option>
+                </select>
+              </div>
+            </div>
 
-          <div class="action-row">
-            <button class="btn-primary" onclick="calculateRoute()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
-              </svg>
-              Find Shortest Path
-            </button>
-            <button class="btn-secondary" onclick="clearRoute()">Clear</button>
+            <div class="route-options">
+              <label class="toggle-label">
+                <input type="checkbox" id="avoid-blocked-toggle" checked onchange="state.avoidBlocked = this.checked;" />
+                Avoid blocked pathways
+              </label>
+            </div>
+
+            <div class="action-row">
+              <button class="btn-primary" onclick="calculateRoute()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                </svg>
+                Find Shortest Path
+              </button>
+              <button class="btn-secondary" onclick="clearRoute()">Clear</button>
+            </div>
           </div>
         </div>
 
-        <!-- Computed Route Card -->
+        <!-- Route result card -->
         <div class="route-result-card" id="route-card">
           <div class="metrics-header">
             <div>
               <div class="metric-main"><span id="r-time">0</span> <span class="metric-unit">min</span></div>
-              <div class="metric-sub"><span id="r-dist">0</span> meters walking &bull; <span id="r-edges">0</span> pathways</div>
+              <div class="metric-sub"><span id="r-dist">0</span>m &bull; <span id="r-edges">0</span> pathways</div>
             </div>
             <button class="btn-secondary" style="font-size: 11px; padding: 5px 8px;" onclick="startVisualizerMode()">Visualizer &rarr;</button>
+          </div>
+
+          <!-- Algorithm metrics -->
+          <div class="algo-metrics-row" id="algo-metrics-row" style="display:none;">
+            <div class="algo-metric-box">
+              <div class="algo-metric-val" id="m-nodes">—</div>
+              <div class="algo-metric-label">Nodes Visited</div>
+            </div>
+            <div class="algo-metric-box">
+              <div class="algo-metric-val" id="m-relax">—</div>
+              <div class="algo-metric-label">Relaxations</div>
+            </div>
+            <div class="algo-metric-box">
+              <div class="algo-metric-val" id="m-ms">—</div>
+              <div class="algo-metric-label">Exec. Time</div>
+            </div>
           </div>
 
           <!-- Alternative route banner -->
           <div class="alt-route-banner" id="alt-banner" style="display: none;">
             <div>
               <strong>Alternative Route Available</strong><br />
-              <span id="alt-stats" style="color: #92400E;">0m &bull; 0 min</span>
+              <span id="alt-stats" style="color: #FCD34D; font-size: 12px;">0m &bull; 0 min</span>
             </div>
             <button class="alt-route-btn" onclick="toggleAlternativeRoute()">View Alternative</button>
           </div>
 
           <!-- Turn-by-turn steps -->
-          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-top: 14px;">Navigation Steps</div>
+          <div class="section-label" style="margin-top: 14px;">Navigation Steps</div>
           <div class="instructions-list" id="steps-list"></div>
         </div>
 
@@ -761,12 +770,36 @@
           </div>
           <div class="block-list" id="block-list" style="display: none;"></div>
         </div>
+
+        <!-- Upload your own map CTA -->
+        <div class="upload-map-cta">
+          <div class="upload-cta-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="16 16 12 12 8 16"></polyline>
+              <line x1="12" y1="12" x2="12" y2="21"></line>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+            </svg>
+            Use Your Own Campus Map
+          </div>
+          <div class="upload-cta-desc">
+            Upload a JSON, CSV, or XLSX file with your own buildings, nodes, coordinates, and pathways. The system auto-generates the interactive map instantly.
+          </div>
+          <div class="upload-cta-actions">
+            <button class="cta-btn-primary" onclick="openUploadModal()">Upload Campus Data</button>
+            <a href="/api/maps/template/?format=json" class="cta-btn-ghost" download>Download Template</a>
+          </div>
+        </div>
       </div>
 
       <div class="sidebar-footer">
-        <a href="{% url 'analytics' %}">Performance Analytics</a>
-        <span>&bull;</span>
-        <a href="{% url 'admin_dashboard' %}">Administrator Dashboard</a>
+        <div>
+          <div class="algo-badge"><div class="algo-badge-dot"></div>Dijkstra + Binary Min-Heap</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="{% url 'analytics' %}">Analytics</a>
+          <span style="color: var(--text-subtle);">&bull;</span>
+          <a href="{% url 'admin_dashboard' %}">Admin</a>
+        </div>
       </div>
     </aside>
 
@@ -780,16 +813,14 @@
         </div>
         <div class="top-right-links">
           <a href="{% url 'analytics' %}" class="map-link-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="20" x2="18" y2="10"></line>
               <line x1="12" y1="20" x2="12" y2="4"></line>
               <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
             Benchmarks
           </a>
-          <a href="{% url 'admin_dashboard' %}" class="map-link-btn">
-            Admin Portal
-          </a>
+          <a href="{% url 'admin_dashboard' %}" class="map-link-btn">Admin Portal</a>
         </div>
       </div>
 
@@ -820,11 +851,49 @@
 
       <!-- Empty State Overlay -->
       <div class="empty-map-overlay" id="empty-state-overlay">
-        <h2>No campus map data is available yet.</h2>
-        <p>Please contact the campus administrator to import or register university locations and walkways.</p>
-        <a href="{% url 'admin_dashboard' %}" class="btn-primary" style="text-decoration: none; display: inline-flex; width: auto;">Go to Admin Portal</a>
+        <div class="empty-map-icon">🗺️</div>
+        <h2>No Campus Map Data Available</h2>
+        <p>Upload a campus map to get started. You can use a JSON, CSV, or XLSX file with buildings, coordinates, and pathways.</p>
+        <div class="empty-cta-row">
+          <button class="cta-btn-primary" onclick="openUploadModal()">Upload Campus Map</button>
+          <a href="{% url 'admin_dashboard' %}" class="cta-btn-ghost">Admin Dashboard</a>
+        </div>
       </div>
     </main>
+  </div>
+
+  <!-- Upload Modal -->
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal-box">
+      <div class="modal-title">Upload Your Campus Map</div>
+      <div class="modal-subtitle">
+        Import your campus data to generate an interactive map instantly. Supports JSON, CSV, and XLSX formats.
+        {% if not is_admin %}
+        <br><span style="color: var(--warning); font-weight: 600;">Note: Requires admin login to save permanently. <a href="{% url 'admin_login' %}" style="color: var(--primary);">Sign in here.</a></span>
+        {% endif %}
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('map-file-input').click()">
+        <div style="font-size: 36px;">📁</div>
+        <p><strong>Click to browse</strong> or drag and drop your file</p>
+        <div class="upload-formats">
+          <span class="format-pill">JSON</span>
+          <span class="format-pill">CSV</span>
+          <span class="format-pill">XLSX</span>
+        </div>
+        <input type="file" id="map-file-input" accept=".json,.csv,.xlsx" style="display:none;" onchange="handleFileSelect(this.files[0])" />
+      </div>
+      <div class="template-links">
+        <a class="template-link" href="/api/maps/template/?format=json" download>⬇ Download JSON template</a>
+        <a class="template-link" href="/api/maps/template/?format=csv" download>⬇ Download CSV template</a>
+      </div>
+      <div class="upload-status" id="upload-status"></div>
+      <div class="modal-btn-row">
+        <button class="modal-close" onclick="closeUploadModal()">✕ Close</button>
+        <button class="btn-primary" id="upload-confirm-btn" onclick="confirmUpload()" style="display:none; flex: unset; padding: 9px 20px;">
+          Confirm Import
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -849,7 +918,6 @@
       dragStart: { x: 0, y: 0 },
       view: { zoom: 1, offsetX: 0, offsetY: 0 },
       nodePositions: new Map(),
-      // Visualizer
       vizActive: false,
       vizTrace: [],
       vizIndex: 0,
@@ -864,6 +932,9 @@
     const HOVER_RADIUS = 13;
     const PADDING = 60;
 
+    // ---------------------------------------------------------------------------
+    // Utilities
+    // ---------------------------------------------------------------------------
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -893,15 +964,12 @@
       try {
         const res = await fetch('/api/campus-graph/');
         const data = await res.json();
-
         state.locations = data.locations || [];
         state.edges = data.edges || [];
 
         if (state.locations.length === 0) {
           document.getElementById('empty-state-overlay').classList.add('active');
           return;
-        } else {
-          document.getElementById('empty-map-overlay')?.classList.remove('active');
         }
 
         state.locById = new Map(state.locations.map(l => [l.id, l]));
@@ -922,19 +990,14 @@
     function populateDropdowns() {
       const srcSel = document.getElementById('src-select');
       const dstSel = document.getElementById('dst-select');
-
       srcSel.innerHTML = '<option value="">Choose Starting Point...</option>';
       dstSel.innerHTML = '<option value="">Choose Destination...</option>';
-
       state.locations.forEach(loc => {
         const opt1 = document.createElement('option');
         opt1.value = loc.id;
         opt1.textContent = `${loc.name} (${loc.type})`;
         srcSel.appendChild(opt1);
-
-        const opt2 = document.createElement('option');
-        opt2.value = loc.id;
-        opt2.textContent = `${loc.name} (${loc.type})`;
+        const opt2 = opt1.cloneNode(true);
         dstSel.appendChild(opt2);
       });
     }
@@ -943,7 +1006,6 @@
       const tmp = state.srcId;
       state.srcId = state.dstId;
       state.dstId = tmp;
-
       document.getElementById('src-select').value = state.srcId || '';
       document.getElementById('dst-select').value = state.dstId || '';
       draw();
@@ -951,66 +1013,37 @@
     }
 
     // ---------------------------------------------------------------------------
-    // Search Functionality
+    // Demo Route — auto-selects North Gate → Computer Science Wing
     // ---------------------------------------------------------------------------
-    function handleSearch(term) {
-      const q = term.trim().toLowerCase();
-      const wrap = document.getElementById('search-results');
-      if (!q) {
-        wrap.classList.remove('active');
+    function runDemoRoute() {
+      if (state.locations.length < 2) {
+        showToast('No campus data loaded yet.');
         return;
       }
+      const demoSrc = state.locations.find(l => l.name.toLowerCase().includes('north gate') || l.name.toLowerCase().includes('gate'));
+      const demoDst = state.locations.find(l => l.name.toLowerCase().includes('computer') || l.name.toLowerCase().includes('cs') || l.name.toLowerCase().includes('south gate') || l.name.toLowerCase().includes('gate') && l.id !== (demoSrc && demoSrc.id));
+      const src = demoSrc || state.locations[0];
+      const dst = demoDst || state.locations[state.locations.length - 1];
 
-      const matches = state.locations.filter(
-        loc => loc.name.toLowerCase().includes(q) || (loc.description && loc.description.toLowerCase().includes(q))
-      );
-
-      if (matches.length === 0) {
-        wrap.innerHTML = '<div style="padding: 10px; font-size: 12px; color: var(--text-muted); text-align: center;">No matching locations.</div>';
-        wrap.classList.add('active');
-        return;
-      }
-
-      wrap.innerHTML = matches.map(loc => `
-        <div class="search-item" onclick="selectSearchResult(${loc.id})">
-          <div>
-            <strong>${loc.name}</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">${loc.type}</div>
-          </div>
-          <button style="padding: 3px 8px; font-size: 11px; border: 1px solid var(--border); border-radius: 4px; background: #fff;">Navigate</button>
-        </div>
-      `).join('');
-      wrap.classList.add('active');
-    }
-
-    function selectSearchResult(locId) {
-      document.getElementById('search-results').classList.remove('active');
-      document.getElementById('quick-search').value = '';
-      if (!state.srcId) {
-        state.srcId = locId;
-        document.getElementById('src-select').value = locId;
-        showToast('Set as Starting Point. Now select a Destination.');
-      } else {
-        state.dstId = locId;
-        document.getElementById('dst-select').value = locId;
-        calculateRoute();
-      }
+      state.srcId = src.id;
+      state.dstId = dst.id;
+      document.getElementById('src-select').value = src.id;
+      document.getElementById('dst-select').value = dst.id;
       draw();
+      showToast(`Demo: ${src.name} → ${dst.name}`);
+      calculateRoute();
     }
 
     // ---------------------------------------------------------------------------
-    // Route Calculation & Rendering
+    // Route Calculation
     // ---------------------------------------------------------------------------
     async function calculateRoute() {
       if (!state.srcId || !state.dstId) {
-        showToast('Please select both a Starting Point and Destination.');
-        return;
+        showToast('Select both a starting point and destination.'); return;
       }
       if (state.srcId === state.dstId) {
-        showToast('Start and Destination are the same location.');
-        return;
+        showToast('Start and destination must be different locations.'); return;
       }
-
       try {
         const res = await fetch('/api/find-path/', {
           method: 'POST',
@@ -1022,79 +1055,141 @@
           })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Route calculation failed');
-
-        state.pathIds = data.path.map(p => p.id);
-        state.primaryData = data;
-        state.altData = data.alternative;
+        if (!res.ok || !data.success) {
+          showToast(data.error || 'No path found.');
+          clearRoute(false);
+          return;
+        }
+        state.pathIds = data.path.map(l => l.id);
+        state.altPathIds = data.alternative_path ? data.alternative_path.map(l => l.id) : [];
         state.showingAlt = false;
 
-        displayRoute(data);
+        const card = document.getElementById('route-card');
+        card.classList.add('active');
+
+        const tMin = Math.ceil((data.travel_time || 0) / 60);
+        document.getElementById('r-time').textContent = tMin;
+        document.getElementById('r-dist').textContent = Math.round(data.distance || 0);
+        document.getElementById('r-edges').textContent = data.edge_count || 0;
+
+        // Show algorithm metrics if available
+        if (data.metrics) {
+          document.getElementById('algo-metrics-row').style.display = 'grid';
+          document.getElementById('m-nodes').textContent = data.metrics.nodes_visited ?? '—';
+          document.getElementById('m-relax').textContent = data.metrics.relaxations ?? '—';
+          document.getElementById('m-ms').textContent = data.metrics.execution_time_ms != null
+            ? data.metrics.execution_time_ms.toFixed(2) + 'ms' : '—';
+        }
+
+        // Alternative route
+        const altBanner = document.getElementById('alt-banner');
+        if (data.alternative_path && data.alternative_distance) {
+          const altMin = Math.ceil((data.alternative_distance / 1.2) / 60);
+          document.getElementById('alt-stats').textContent =
+            `${Math.round(data.alternative_distance)}m • ${altMin} min`;
+          altBanner.style.display = 'flex';
+        } else {
+          altBanner.style.display = 'none';
+        }
+
+        // Steps
+        const stepsList = document.getElementById('steps-list');
+        stepsList.innerHTML = '';
+        if (data.instructions && data.instructions.length > 0) {
+          data.instructions.forEach((step, i) => {
+            const div = document.createElement('div');
+            div.className = 'step-row';
+            div.innerHTML = `<div class="step-num">${i + 1}</div>
+              <div><div class="step-text">${step.instruction}</div>
+              <div class="step-dist">${step.distance ? Math.round(step.distance) + 'm' : ''}</div></div>`;
+            stepsList.appendChild(div);
+          });
+        } else {
+          state.pathIds.forEach((id, i) => {
+            const loc = state.locById.get(id);
+            if (!loc) return;
+            const div = document.createElement('div');
+            div.className = 'step-row';
+            div.innerHTML = `<div class="step-num">${i + 1}</div>
+              <div class="step-text">${i === 0 ? 'Start at' : i === state.pathIds.length - 1 ? 'Arrive at' : 'Via'} <strong>${loc.name}</strong></div>`;
+            stepsList.appendChild(div);
+          });
+        }
+
         draw();
       } catch (err) {
-        showToast(err.message);
-        clearRoute();
+        showToast('Error calculating route: ' + err.message);
       }
     }
 
-    function displayRoute(data) {
-      const card = document.getElementById('route-card');
-      card.classList.add('active');
-
-      document.getElementById('r-time').textContent = data.time_minutes.toFixed(0);
-      document.getElementById('r-dist').textContent = data.distance.toFixed(0);
-      document.getElementById('r-edges').textContent = data.edge_count;
-
-      // Alternative banner
-      const altBanner = document.getElementById('alt-banner');
-      if (data.alternative) {
-        document.getElementById('alt-stats').textContent = `${data.alternative.distance.toFixed(0)}m • ${data.alternative.time_minutes.toFixed(0)} min`;
-        altBanner.style.display = 'flex';
-      } else {
-        altBanner.style.display = 'none';
+    function clearRoute(resetSelects = true) {
+      state.pathIds = [];
+      state.altPathIds = [];
+      state.showingAlt = false;
+      if (resetSelects) {
+        state.srcId = null; state.dstId = null;
+        document.getElementById('src-select').value = '';
+        document.getElementById('dst-select').value = '';
       }
-
-      // Steps list
-      const stepsList = document.getElementById('steps-list');
-      stepsList.innerHTML = (data.steps || []).map(s => `
-        <div class="instruction-step">
-          <div class="step-num">${s.step}</div>
-          <div class="step-text">${s.instruction}</div>
-          <div class="step-dist">${s.distance > 0 ? s.distance.toFixed(0) + 'm' : ''}</div>
-        </div>
-      `).join('');
+      document.getElementById('route-card').classList.remove('active');
+      document.getElementById('alt-banner').style.display = 'none';
+      document.getElementById('algo-metrics-row').style.display = 'none';
+      document.getElementById('steps-list').innerHTML = '';
+      stopVisualizer();
+      draw();
     }
 
     function toggleAlternativeRoute() {
-      if (!state.altData) return;
       state.showingAlt = !state.showingAlt;
-      if (state.showingAlt) {
-        state.pathIds = state.altData.path.map(p => p.id);
-        showToast('Displaying alternative path.');
+      const btn = document.querySelector('.alt-route-btn');
+      btn.textContent = state.showingAlt ? 'View Primary' : 'View Alternative';
+      state.pathIds = state.showingAlt ? state.altPathIds : state.pathIds;
+      draw();
+    }
+
+    // ---------------------------------------------------------------------------
+    // Search
+    // ---------------------------------------------------------------------------
+    function handleSearch(val) {
+      const container = document.getElementById('search-results');
+      if (!val.trim()) { container.classList.remove('active'); return; }
+      const matches = state.locations.filter(l => l.name.toLowerCase().includes(val.toLowerCase()));
+      if (!matches.length) { container.classList.remove('active'); return; }
+      container.innerHTML = matches.slice(0, 8).map(l => `
+        <div class="search-item" onclick="selectFromSearch(${l.id}, '${l.name.replace(/'/g,"\\'")}')">
+          <span>${l.name}</span>
+          <span style="font-size: 11px; color: var(--text-subtle); text-transform: uppercase;">${l.type}</span>
+        </div>`).join('');
+      container.classList.add('active');
+    }
+
+    function selectFromSearch(id, name) {
+      document.getElementById('search-results').classList.remove('active');
+      document.getElementById('quick-search').value = '';
+      if (!state.srcId) {
+        state.srcId = id;
+        document.getElementById('src-select').value = id;
+        showToast(`Set "${name}" as Starting Point.`);
       } else {
-        state.pathIds = state.primaryData.path.map(p => p.id);
-        showToast('Displaying primary shortest path.');
+        state.dstId = id;
+        document.getElementById('dst-select').value = id;
+        calculateRoute();
       }
       draw();
     }
 
-    function clearRoute() {
-      state.pathIds = [];
-      state.altPathIds = [];
-      state.srcId = null;
-      state.dstId = null;
-      document.getElementById('src-select').value = '';
-      document.getElementById('dst-select').value = '';
-      document.getElementById('route-card').classList.remove('active');
-      draw();
-    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-box')) {
+        document.getElementById('search-results').classList.remove('active');
+      }
+    });
 
     // ---------------------------------------------------------------------------
-    // Canvas Geometry, Zoom, Pan
+    // Canvas Rendering
     // ---------------------------------------------------------------------------
     function resizeCanvas() {
-      const rect = canvas.parentElement.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1112,14 +1207,12 @@
 
     function zoomIn() {
       state.view.zoom = Math.min(3.5, state.view.zoom * 1.25);
-      computeNodePositions();
-      draw();
+      computeNodePositions(); draw();
     }
 
     function zoomOut() {
       state.view.zoom = Math.max(0.5, state.view.zoom / 1.25);
-      computeNodePositions();
-      draw();
+      computeNodePositions(); draw();
     }
 
     function computeNodePositions() {
@@ -1128,7 +1221,6 @@
       const h = rect.height;
       const drawW = (w - PADDING * 2) * state.view.zoom;
       const drawH = (h - PADDING * 2) * state.view.zoom;
-
       state.nodePositions.clear();
       state.locations.forEach(loc => {
         const sx = PADDING + loc.x * drawW + state.view.offsetX;
@@ -1137,43 +1229,25 @@
       });
     }
 
-    // ---------------------------------------------------------------------------
-    // Canvas Drawing Engine
-    // ---------------------------------------------------------------------------
     function draw() {
       const rect = canvas.parentElement.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
-
-      // Clean background grid
       drawGrid(rect.width, rect.height);
-
-      // Draw normal & blocked edges
       drawEdges();
-
-      // Draw highlighted route
       drawRouteHighlight();
-
-      // Draw campus nodes
       drawNodes();
     }
 
     function drawGrid(w, h) {
-      ctx.strokeStyle = '#E2E8F0';
+      ctx.strokeStyle = 'rgba(99, 143, 196, 0.07)';
       ctx.lineWidth = 0.6;
-      const step = 40 * state.view.zoom;
+      const step = 50 * state.view.zoom;
       if (step < 12) return;
       const startX = state.view.offsetX % step;
       const startY = state.view.offsetY % step;
-
       ctx.beginPath();
-      for (let x = startX; x < w; x += step) {
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-      }
-      for (let y = startY; y < h; y += step) {
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-      }
+      for (let x = startX; x < w; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
+      for (let y = startY; y < h; y += step) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
       ctx.stroke();
     }
 
@@ -1185,49 +1259,67 @@
         const k = edgeKey(edge.source, edge.destination);
         if (drawn.has(k)) return;
         drawn.add(k);
-
         const a = state.nodePositions.get(edge.source);
         const b = state.nodePositions.get(edge.destination);
         if (!a || !b) return;
 
-        const isBlocked = edge.is_blocked;
-
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(b.x, b.y);
-
-        if (isBlocked) {
-          ctx.strokeStyle = '#EF4444';
+        if (edge.is_blocked) {
+          ctx.strokeStyle = 'rgba(248, 113, 113, 0.7)';
           ctx.lineWidth = 2.5;
           ctx.setLineDash([5, 5]);
           ctx.stroke();
           ctx.setLineDash([]);
         } else {
-          ctx.strokeStyle = '#CBD5E1';
-          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'rgba(99, 143, 196, 0.25)';
+          ctx.lineWidth = 1.8;
           ctx.stroke();
         }
       });
     }
 
     function drawRouteHighlight() {
-      if (state.pathIds.length < 2) return;
-
+      const ids = state.pathIds;
+      if (ids.length < 2) return;
       ctx.save();
+
+      // Glow pass
       ctx.beginPath();
-      for (let i = 0; i < state.pathIds.length - 1; i++) {
-        const a = state.nodePositions.get(state.pathIds[i]);
-        const b = state.nodePositions.get(state.pathIds[i + 1]);
+      for (let i = 0; i < ids.length - 1; i++) {
+        const a = state.nodePositions.get(ids[i]);
+        const b = state.nodePositions.get(ids[i + 1]);
         if (!a || !b) continue;
         if (i === 0) ctx.moveTo(a.x, a.y);
         ctx.lineTo(b.x, b.y);
       }
-
-      ctx.strokeStyle = '#2563EB';
-      ctx.lineWidth = 5;
+      ctx.strokeStyle = 'rgba(99, 179, 237, 0.2)';
+      ctx.lineWidth = 14;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.shadowColor = 'rgba(37, 99, 235, 0.4)';
+      ctx.stroke();
+
+      // Main line
+      ctx.beginPath();
+      for (let i = 0; i < ids.length - 1; i++) {
+        const a = state.nodePositions.get(ids[i]);
+        const b = state.nodePositions.get(ids[i + 1]);
+        if (!a || !b) continue;
+        if (i === 0) ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+      }
+      const grad = ctx.createLinearGradient(
+        state.nodePositions.get(ids[0])?.x || 0,
+        state.nodePositions.get(ids[0])?.y || 0,
+        state.nodePositions.get(ids[ids.length - 1])?.x || 100,
+        state.nodePositions.get(ids[ids.length - 1])?.y || 100
+      );
+      grad.addColorStop(0, '#3B82F6');
+      grad.addColorStop(1, '#8B5CF6');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 4;
+      ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
       ctx.shadowBlur = 10;
       ctx.stroke();
       ctx.restore();
@@ -1237,35 +1329,37 @@
       state.locations.forEach(loc => {
         const pos = state.nodePositions.get(loc.id);
         if (!pos) return;
-
         const isSrc = state.srcId === loc.id;
         const isDst = state.dstId === loc.id;
         const isOnPath = state.pathIds.includes(loc.id);
         const isHover = state.hoverNode === loc.id;
         const isVizVisited = state.vizVisited.has(loc.id);
-
         const r = isHover || isSrc || isDst ? HOVER_RADIUS : NODE_RADIUS;
 
-        // Outer halo / glow
         ctx.save();
+        // Node fill
         if (isSrc) {
-          ctx.fillStyle = '#2563EB';
-          ctx.shadowColor = 'rgba(37, 99, 235, 0.5)';
-          ctx.shadowBlur = 14;
-        } else if (isDst) {
-          ctx.fillStyle = '#EF4444';
-          ctx.shadowColor = 'rgba(239, 68, 68, 0.5)';
-          ctx.shadowBlur = 14;
-        } else if (isOnPath) {
           ctx.fillStyle = '#3B82F6';
-          ctx.shadowColor = 'rgba(59, 130, 246, 0.4)';
-          ctx.shadowBlur = 8;
+          ctx.shadowColor = 'rgba(59, 130, 246, 0.7)';
+          ctx.shadowBlur = 18;
+        } else if (isDst) {
+          ctx.fillStyle = '#F87171';
+          ctx.shadowColor = 'rgba(248, 113, 113, 0.7)';
+          ctx.shadowBlur = 18;
+        } else if (isOnPath) {
+          ctx.fillStyle = '#6366F1';
+          ctx.shadowColor = 'rgba(99, 102, 241, 0.5)';
+          ctx.shadowBlur = 10;
         } else if (isVizVisited) {
           ctx.fillStyle = '#F59E0B';
-          ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
+          ctx.shadowColor = 'rgba(245, 158, 11, 0.5)';
+          ctx.shadowBlur = 10;
+        } else if (isHover) {
+          ctx.fillStyle = '#6B7280';
+          ctx.shadowColor = 'rgba(107,114,128,0.5)';
           ctx.shadowBlur = 8;
         } else {
-          ctx.fillStyle = '#64748B';
+          ctx.fillStyle = '#374151';
           ctx.shadowBlur = 0;
         }
 
@@ -1273,19 +1367,27 @@
         ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Inner center dot
+        // Ring
+        ctx.strokeStyle = isSrc ? '#93C5FD' : isDst ? '#FCA5A5' : isOnPath ? '#A5B4FC' : 'rgba(99,143,196,0.3)';
+        ctx.lineWidth = isSrc || isDst || isOnPath ? 2 : 1;
+        ctx.stroke();
+
+        // Inner dot
         ctx.fillStyle = '#FFFFFF';
+        ctx.shadowBlur = 0;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, r * 0.45, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, r * 0.38, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
-        // Location text label
+        // Label
         ctx.save();
-        ctx.font = isSrc || isDst || isOnPath ? '600 12px ' + getComputedStyle(document.body).fontFamily : '500 11px ' + getComputedStyle(document.body).fontFamily;
-        ctx.fillStyle = isSrc || isDst || isOnPath ? '#0F172A' : '#475569';
+        ctx.font = (isSrc || isDst || isOnPath ? '600' : '500') + ` ${isSrc || isDst ? 12 : 11}px ${getComputedStyle(document.body).fontFamily}`;
+        ctx.fillStyle = isSrc ? '#93C5FD' : isDst ? '#FCA5A5' : isOnPath ? '#C4B5FD' : 'rgba(139,163,199,0.8)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 4;
         ctx.fillText(loc.name, pos.x, pos.y + r + 4);
         ctx.restore();
       });
@@ -1299,9 +1401,7 @@
       state.dragStart = { x: e.clientX, y: e.clientY };
     });
 
-    window.addEventListener('mouseup', () => {
-      state.dragActive = false;
-    });
+    window.addEventListener('mouseup', () => { state.dragActive = false; });
 
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -1317,13 +1417,10 @@
         return;
       }
 
-      // Check node hover
       let foundNode = null;
       for (const [id, pos] of state.nodePositions.entries()) {
-        const dist = Math.hypot(mouseX - pos.x, mouseY - pos.y);
-        if (dist <= HOVER_RADIUS + 4) {
-          foundNode = id;
-          break;
+        if (Math.hypot(mouseX - pos.x, mouseY - pos.y) <= HOVER_RADIUS + 4) {
+          foundNode = id; break;
         }
       }
 
@@ -1340,13 +1437,12 @@
       state.view.zoom = Math.max(0.4, Math.min(4.0, state.view.zoom * delta));
       computeNodePositions();
       draw();
-    });
+    }, { passive: false });
 
     canvas.addEventListener('click', (e) => {
       if (!state.hoverNode) return;
       const node = state.locById.get(state.hoverNode);
       if (!node) return;
-
       if (!state.srcId) {
         state.srcId = node.id;
         document.getElementById('src-select').value = node.id;
@@ -1357,7 +1453,6 @@
         showToast(`Set "${node.name}" as Destination.`);
         calculateRoute();
       } else {
-        // Change destination
         state.dstId = node.id;
         document.getElementById('dst-select').value = node.id;
         calculateRoute();
@@ -1367,13 +1462,9 @@
 
     function updateTooltip(nodeId, clientX, clientY) {
       const tip = document.getElementById('map-tooltip');
-      if (!nodeId) {
-        tip.style.display = 'none';
-        return;
-      }
+      if (!nodeId) { tip.style.display = 'none'; return; }
       const loc = state.locById.get(nodeId);
       if (!loc) return;
-
       document.getElementById('tip-name').textContent = loc.name;
       document.getElementById('tip-type').textContent = loc.type;
       tip.style.left = (clientX + 14) + 'px';
@@ -1388,11 +1479,9 @@
       const list = document.getElementById('block-list');
       const badge = document.getElementById('block-count-badge');
       const blockedEdges = state.edges.filter(e => e.is_blocked);
-      const halfCount = Math.floor(blockedEdges.length / 2);
-      badge.textContent = halfCount;
+      badge.textContent = Math.floor(blockedEdges.length / 2);
 
-      const seen = new Set();
-      const uniqueBlocked = [];
+      const seen = new Set(); const uniqueBlocked = [];
       blockedEdges.forEach(e => {
         const k = edgeKey(e.source, e.destination);
         if (seen.has(k)) return;
@@ -1400,17 +1489,15 @@
         uniqueBlocked.push(e);
       });
 
-      if (uniqueBlocked.length === 0) {
-        list.innerHTML = '<div style="padding: 10px; font-size: 12px; color: var(--text-muted); text-align: center;">No campus pathways currently blocked.</div>';
+      if (!uniqueBlocked.length) {
+        list.innerHTML = '<div style="padding: 10px; font-size: 12px; color: var(--text-subtle); text-align: center;">No campus pathways currently blocked.</div>';
         return;
       }
-
       list.innerHTML = uniqueBlocked.map(e => `
         <div class="block-row">
           <span>${e.source_name} &harr; ${e.destination_name}</span>
           <span style="font-size: 11px; color: var(--danger); font-weight: 600;">Blocked</span>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
 
     function toggleBlockAccordion() {
@@ -1423,23 +1510,16 @@
     // ---------------------------------------------------------------------------
     async function startVisualizerMode() {
       if (!state.srcId || !state.dstId) {
-        showToast('Select starting point and destination first.');
-        return;
+        showToast('Select starting point and destination first.'); return;
       }
-
       try {
         const res = await fetch('/api/visualize/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-          body: JSON.stringify({
-            source_id: state.srcId,
-            destination_id: state.dstId,
-            avoid_blocked: state.avoidBlocked
-          })
+          body: JSON.stringify({ source_id: state.srcId, destination_id: state.dstId, avoid_blocked: state.avoidBlocked })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Visualization failed');
-
         state.vizTrace = data.trace || [];
         state.vizIndex = 0;
         state.vizVisited.clear();
@@ -1447,9 +1527,7 @@
         document.getElementById('viz-bar').classList.add('active');
         updateVizStatus();
         showToast('Visualizer ready. Click Play or Step to trace Dijkstra exploration.');
-      } catch (err) {
-        showToast(err.message);
-      }
+      } catch (err) { showToast(err.message); }
     }
 
     function toggleVizPlay() {
@@ -1493,6 +1571,109 @@
       document.getElementById('viz-bar').classList.remove('active');
       draw();
     }
+
+    // ---------------------------------------------------------------------------
+    // Upload Modal
+    // ---------------------------------------------------------------------------
+    let pendingFile = null;
+
+    function openUploadModal() {
+      document.getElementById('upload-modal').classList.add('active');
+      document.getElementById('upload-status').textContent = '';
+      document.getElementById('upload-status').className = 'upload-status';
+      document.getElementById('upload-confirm-btn').style.display = 'none';
+      pendingFile = null;
+    }
+
+    function closeUploadModal() {
+      document.getElementById('upload-modal').classList.remove('active');
+      document.getElementById('map-file-input').value = '';
+      pendingFile = null;
+    }
+
+    async function handleFileSelect(file) {
+      if (!file) return;
+      pendingFile = file;
+      const statusEl = document.getElementById('upload-status');
+      statusEl.textContent = `📄 ${file.name} selected. Validating...`;
+      statusEl.className = 'upload-status';
+
+      const form = new FormData();
+      form.append('file', file);
+
+      try {
+        const res = await fetch('/api/maps/upload-preview/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+          body: form
+        });
+        const data = await res.json();
+
+        if (res.status === 403) {
+          statusEl.textContent = '🔒 Admin login required to upload maps. Please sign in first.';
+          statusEl.className = 'upload-status err';
+          return;
+        }
+
+        if (!data.valid) {
+          statusEl.textContent = '❌ Validation errors: ' + (data.errors || []).join('; ');
+          statusEl.className = 'upload-status err';
+          return;
+        }
+
+        const stats = data.stats || {};
+        statusEl.textContent = `✅ Valid! ${stats.location_count || 0} locations, ${stats.edge_count || 0} pathways found. Ready to import.`;
+        statusEl.className = 'upload-status ok';
+        document.getElementById('upload-confirm-btn').style.display = 'block';
+      } catch (err) {
+        statusEl.textContent = '❌ Error validating file: ' + err.message;
+        statusEl.className = 'upload-status err';
+      }
+    }
+
+    async function confirmUpload() {
+      if (!pendingFile) return;
+      const statusEl = document.getElementById('upload-status');
+      statusEl.textContent = '⏳ Importing campus data...';
+
+      const form = new FormData();
+      form.append('file', pendingFile);
+
+      try {
+        const res = await fetch('/api/maps/upload-confirm/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+          body: form
+        });
+        const data = await res.json();
+        if (data.success) {
+          statusEl.textContent = '✅ Campus map imported successfully! Reloading...';
+          statusEl.className = 'upload-status ok';
+          setTimeout(() => { closeUploadModal(); location.reload(); }, 1500);
+        } else {
+          statusEl.textContent = '❌ ' + (data.message || data.error || 'Import failed.');
+          statusEl.className = 'upload-status err';
+        }
+      } catch (err) {
+        statusEl.textContent = '❌ ' + err.message;
+        statusEl.className = 'upload-status err';
+      }
+    }
+
+    // Drag and drop on upload zone
+    document.addEventListener('DOMContentLoaded', () => {
+      const zone = document.querySelector('.upload-zone');
+      if (zone) {
+        zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; });
+        zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+        zone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zone.style.borderColor = '';
+          const file = e.dataTransfer.files[0];
+          if (file) handleFileSelect(file);
+        });
+      }
+    });
 
     window.addEventListener('resize', resizeCanvas);
     init();

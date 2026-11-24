@@ -6,20 +6,20 @@
   <title>Administrator Sign In — Campus Navigation</title>
   <style>
     :root {
-      --bg: #F8FAFC;
-      --card-bg: #FFFFFF;
-      --border: #E2E8F0;
-      --primary: #2563EB;
-      --primary-hover: #1D4ED8;
-      --text: #0F172A;
-      --text-muted: #64748B;
-      --danger: #EF4444;
-      --danger-bg: #FEF2F2;
+      --bg: #0D1B2A;
+      --card-bg: #132236;
+      --border: rgba(99,179,237,0.2);
+      --primary: #3B82F6;
+      --primary-hover: #2563EB;
+      --text: #E2E8F0;
+      --text-muted: #94A3B8;
+      --danger: #FC8181;
+      --danger-bg: rgba(252,129,129,0.12);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
+      background: linear-gradient(135deg, #0D1B2A 0%, #0a1628 50%, #0D1B2A 100%);
       color: var(--text);
       display: flex;
       align-items: center;
@@ -30,11 +30,64 @@
     .login-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,179,237,0.08);
       width: 100%;
-      max-width: 400px;
-      padding: 32px;
+      max-width: 420px;
+      padding: 36px;
+    }
+    /* Demo credentials card */
+    .demo-card {
+      background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(59,130,246,0.12));
+      border: 1px solid rgba(16,185,129,0.35);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 22px;
+    }
+    .demo-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .demo-badge {
+      font-size: 12px;
+      font-weight: 700;
+      color: #34D399;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .autofill-btn {
+      background: linear-gradient(135deg, #10B981, #3B82F6);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .autofill-btn:hover { opacity: 0.85; }
+    .demo-cred-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .cred-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      min-width: 72px;
+    }
+    .cred-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #A5F3FC;
+      font-family: "SF Mono", "Fira Code", monospace;
+      background: rgba(165,243,252,0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
     }
     .logo-row {
       display: flex;
@@ -43,21 +96,22 @@
       margin-bottom: 24px;
     }
     .logo-badge {
-      width: 40px;
-      height: 40px;
-      background: var(--primary);
-      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
+      box-shadow: 0 4px 14px rgba(59,130,246,0.4);
     }
     .logo-badge svg { width: 22px; height: 22px; }
-    h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+    h1 { font-size: 20px; font-weight: 700; color: var(--text); }
     .subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
     .error-alert {
       background: var(--danger-bg);
-      border: 1px solid #FECACA;
+      border: 1px solid rgba(252,129,129,0.3);
       color: var(--danger);
       padding: 10px 14px;
       border-radius: 6px;
@@ -79,31 +133,33 @@
       padding: 10px 12px;
       font-size: 14px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       outline: none;
-      transition: border-color 0.15s ease;
-      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
     }
     input[type="text"]:focus, input[type="password"]:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
+    input::placeholder { color: var(--text-muted); }
     .submit-btn {
       width: 100%;
-      padding: 11px;
-      background: var(--primary);
+      padding: 12px;
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
       color: #fff;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: opacity 0.2s ease, transform 0.1s ease;
       margin-top: 6px;
+      letter-spacing: 0.02em;
     }
-    .submit-btn:hover {
-      background: var(--primary-hover);
-    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
     .back-link {
       display: block;
       text-align: center;
@@ -111,6 +167,7 @@
       font-size: 13px;
       color: var(--text-muted);
       text-decoration: none;
+      transition: color 0.15s;
     }
     .back-link:hover { color: var(--primary); }
   </style>
@@ -128,6 +185,22 @@
       <div>
         <h1>Admin Portal</h1>
         <div class="subtitle">Campus Navigation System</div>
+      </div>
+    </div>
+
+    <!-- Demo Credentials Banner -->
+    <div class="demo-card">
+      <div class="demo-card-header">
+        <span class="demo-badge">🎯 Demo Access</span>
+        <button class="autofill-btn" onclick="autofillDemo()">⚡ Auto-fill</button>
+      </div>
+      <div class="demo-cred-row">
+        <span class="cred-label">Username:</span>
+        <span class="cred-val">admin</span>
+      </div>
+      <div class="demo-cred-row">
+        <span class="cred-label">Password:</span>
+        <span class="cred-val">admin123</span>
       </div>
     </div>
 
@@ -152,6 +225,22 @@
 
     <a href="{% url 'home' %}" class="back-link">&larr; Return to Campus Map</a>
   </div>
+
+  <script>
+    function autofillDemo() {
+      document.getElementById('username').value = 'admin';
+      document.getElementById('password').value = 'admin123';
+      document.getElementById('username').focus();
+      // Visual feedback on the button
+      const btn = event.target;
+      btn.textContent = '✓ Filled!';
+      btn.style.background = 'linear-gradient(135deg,#059669,#2563EB)';
+      setTimeout(() => {
+        btn.textContent = '⚡ Auto-fill';
+        btn.style.background = '';
+      }, 1500);
+    }
+  </script>
 </body>
 </html>
 
